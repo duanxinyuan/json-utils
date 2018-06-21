@@ -4,10 +4,54 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.dxy</groupId>
-    <artifactId>library.json</artifactId>
+    <parent>
+        <groupId>org.sonatype.oss</groupId>
+        <artifactId>oss-parent</artifactId>
+        <version>9</version>
+    </parent>
+
+    <groupId>com.github.duanxinyuan</groupId>
+    <artifactId>library-json</artifactId>
     <version>1.0.0</version>
     <packaging>jar</packaging>
+
+    <distributionManagement>
+        <snapshotRepository>
+            <id>oss</id>
+            <name>OSS Snapshots Repository</name>
+            <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+        </snapshotRepository>
+        <repository>
+            <id>oss</id>
+            <name>OSS Staging Repository</name>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+        </repository>
+    </distributionManagement>
+
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+        </license>
+    </licenses>
+
+    <name>Json-Utils</name>
+    <url>https://github.com/duanxinyuan/Json-Utils</url>
+    <description>Json工具类，包含Gson、FastJson、Jackson三个库的工具类</description>
+
+    <scm>
+        <connection>scm:git:https://github.com/duanxinyuan/Json-Utils.git</connection>
+        <developerConnection>scm:git:https://github.com/duanxinyuan/Json-Utils.git</developerConnection>
+        <url>https://github.com/duanxinyuan/Json-Utils</url>
+    </scm>
+
+    <developers>
+        <developer>
+            <name>duanxinyuan</name>
+            <email>919317632@qq.com</email>
+            <url>https://github.com/duanxinyuan</url>
+        </developer>
+    </developers>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -40,26 +84,15 @@
 
     <build>
         <plugins>
-            <!-- 项目包打到/target/lib目录下 -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <version>2.4</version>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.1</version>
                 <configuration>
-                    <outputDirectory>${project.build.directory}/${project.artifactId}/lib</outputDirectory>
-                    <archive>
-                        <addMavenDescriptor>false</addMavenDescriptor>
-                    </archive>
-                    <excludes>
-                        <exclude>**/*Test.class</exclude>
-                        <exclude>**/*.properties</exclude>
-                        <exclude>**/*.sql</exclude>
-                        <exclude>**/*.xml</exclude>
-                        <exclude>**/*.txt</exclude>
-                    </excludes>
+                    <source>1.8</source>
+                    <target>1.8</target>
                 </configuration>
             </plugin>
         </plugins>
     </build>
-
 </project>

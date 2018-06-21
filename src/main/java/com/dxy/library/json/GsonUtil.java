@@ -7,9 +7,11 @@ package com.dxy.library.json;
 
 import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
+import com.google.gson.stream.JsonReader;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 
+import java.io.StringReader;
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -26,27 +28,6 @@ public class GsonUtil {
     private static Gson exposeGson;
 
     /**
-     * json中对于Html的转义,new Gson()默认对Html进行转义，如果不想转义使用下面的方法
-     * @return gson
-     */
-    public Gson getHtmlGson() {
-        GsonBuilder builder = new GsonBuilder();
-        builder.disableHtmlEscaping();
-        return builder.create();
-    }
-
-    /**
-     * json中日期格式的处理，使用该对象进行json的处理，如果出现日期Date类的对象，就会按照设置的格式进行处理
-     * @param format 时间格式
-     * @return gson
-     */
-    public static Gson getDateGson(String format) {
-        GsonBuilder builder = new GsonBuilder();
-        builder.setDateFormat(format);
-        return builder.create();
-    }
-
-    /**
      * 格式化Json
      * @return json
      */
@@ -57,11 +38,36 @@ public class GsonUtil {
         return gson.toJson(je);
     }
 
+    /**
+     * json中对于Html的转义,new Gson()默认对Html进行转义，如果不想转义使用下面的方法
+     * @return gson
+     */
+    public Gson getHtmlGson() {
+        GsonBuilder gsonBuilder = new GsonBuilder();
+        gsonBuilder.disableHtmlEscaping();
+        gsonBuilder = registTypeAdapter(gsonBuilder);
+        return gsonBuilder.create();
+    }
+
+    /**
+     * json中日期格式的处理，使用该对象进行json的处理，如果出现日期Date类的对象，就会按照设置的格式进行处理
+     * @param format 时间格式
+     * @return gson
+     */
+    public static Gson getDateGson(String format) {
+        GsonBuilder gsonBuilder = new GsonBuilder();
+        gsonBuilder.setDateFormat(format);
+        gsonBuilder = registTypeAdapter(gsonBuilder);
+        return gsonBuilder.create();
+    }
+
     public static Gson getGson() {
         if (null == gson) {
             synchronized (GsonUtil.class) {
                 if (gson == null) {
-                    gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
+                    GsonBuilder gsonBuilder = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss");
+                    gsonBuilder = registTypeAdapter(gsonBuilder);
+                    gson = gsonBuilder.create();
                 }
             }
         }
@@ -70,31 +76,101 @@ public class GsonUtil {
 
     public static Gson getExposeGson() {
         if (null == exposeGson) {
-            exposeGson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
+            GsonBuilder gsonBuilder = new GsonBuilder().excludeFieldsWithoutExposeAnnotation();
+            gsonBuilder = registTypeAdapter(gsonBuilder);
+            exposeGson = gsonBuilder.create();
         }
         return exposeGson;
     }
 
+    private static GsonBuilder registTypeAdapter(GsonBuilder gsonBuilder) {
+        gsonBuilder.registerTypeAdapter(short.class, new NumberTypeAdapter(Short.class));
+        gsonBuilder.registerTypeAdapter(Short.class, new NumberTypeAdapter(Short.class));
+        gsonBuilder.registerTypeAdapter(int.class, new NumberTypeAdapter(Integer.class));
+        gsonBuilder.registerTypeAdapter(Integer.class, new NumberTypeAdapter(Integer.class));
+        gsonBuilder.registerTypeAdapter(long.class, new NumberTypeAdapter(Long.class));
+        gsonBuilder.registerTypeAdapter(Long.class, new NumberTypeAdapter(Long.class));
+        gsonBuilder.registerTypeAdapter(float.class, new NumberTypeAdapter(Float.class));
+        gsonBuilder.registerTypeAdapter(Float.class, new NumberTypeAdapter(Float.class));
+        gsonBuilder.registerTypeAdapter(double.class, new NumberTypeAdapter(Double.class));
+        gsonBuilder.registerTypeAdapter(Double.class, new NumberTypeAdapter(Double.class));
+        return gsonBuilder;
+    }
+
+    /**
+     * JSON解析
+     */
     public static <V> V from(Object jsonObj, Class<V> c) {
         return getGson().fromJson(jsonObj.toString(), c);
     }
 
+    /**
+     * JSON解析
+     */
     public static <V> V from(String json, Class<V> c) {
         return getGson().fromJson(json, c);
     }
 
+    /**
+     * JSON解析
+     */
     public static <V> V from(String json, Type type) {
         return getGson().fromJson(json, type);
     }
 
+    /**
+     * JSON解析
+     */
     public static <V> V from(String json, TypeToken<V> typeToken) {
         return getGson().fromJson(json, typeToken.getType());
     }
 
+    /**
+     * 宽松JSON解析
+     */
+    public static <V> V lenientFrom(Object jsonObj, Class<V> c) {
+        JsonReader reader = new JsonReader(new StringReader(jsonObj.toString()));
+        reader.setLenient(true);
+        return getGson().fromJson(reader, c);
+    }
+
+    /**
+     * 宽松JSON解析
+     */
+    public static <V> V lenientFrom(String json, Class<V> c) {
+        JsonReader reader = new JsonReader(new StringReader(json));
+        reader.setLenient(true);
+        return getGson().fromJson(reader, c);
+    }
+
+    /**
+     * 宽松JSON解析
+     */
+    public static <V> V lenientFrom(String json, Type type) {
+        JsonReader reader = new JsonReader(new StringReader(json));
+        reader.setLenient(true);
+        return getGson().fromJson(reader, type);
+    }
+
+    /**
+     * 宽松JSON解析
+     */
+    public static <V> V lenientFrom(String json, TypeToken<V> typeToken) {
+        JsonReader reader = new JsonReader(new StringReader(json));
+        reader.setLenient(true);
+        return getGson().fromJson(reader, typeToken.getType());
+    }
+
+    /**
+     * 转化为JSON
+     */
     public static <V> String to(ArrayList<V> list) {
         return getGson().toJson(list);
     }
 
+    /**
+     * 转化为JSON
+     */
     public static <V> String to(V v) {
         return getGson().toJson(v);
     }
