@@ -25,18 +25,33 @@ public class NumberTypeAdapter extends TypeAdapter<Number> {
 
     @Override
     public Number read(JsonReader jsonReader) throws IOException {
-        if (c == Short.class) {
-            return NumberUtils.toShort(jsonReader.nextString());
-        } else if (c == Integer.class) {
-            return NumberUtils.toInt(jsonReader.nextString());
-        } else if (c == Long.class) {
-            return NumberUtils.toLong(jsonReader.nextString());
-        } else if (c == Float.class) {
-            return NumberUtils.toFloat(jsonReader.nextString());
-        } else if (c == Double.class) {
-            return NumberUtils.toDouble(jsonReader.nextString());
-        } else {
-            return NumberUtils.toInt(jsonReader.nextString());
+        try {
+            String json = jsonReader.nextString();
+            if (c == short.class) {
+                return NumberUtils.toShort(json);
+            } else if (c == Short.class) {
+                return Short.parseShort(json);
+            } else if (c == int.class) {
+                return NumberUtils.toInt(json);
+            } else if (c == Integer.class) {
+                return Integer.parseInt(json);
+            } else if (c == long.class) {
+                return NumberUtils.toLong(json);
+            } else if (c == Long.class) {
+                return Long.parseLong(json);
+            } else if (c == float.class) {
+                return NumberUtils.toFloat(json);
+            } else if (c == Float.class) {
+                return Float.parseFloat(json);
+            } else if (c == double.class) {
+                return NumberUtils.toDouble(json);
+            } else if (c == Double.class) {
+                return Double.parseDouble(json);
+            } else {
+                return Integer.parseInt(json);
+            }
+        } catch (Exception e) {
+            return null;
         }
     }
 }

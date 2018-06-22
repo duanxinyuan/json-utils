@@ -84,15 +84,15 @@ public class GsonUtil {
     }
 
     private static GsonBuilder registTypeAdapter(GsonBuilder gsonBuilder) {
-        gsonBuilder.registerTypeAdapter(short.class, new NumberTypeAdapter(Short.class));
+        gsonBuilder.registerTypeAdapter(short.class, new NumberTypeAdapter(short.class));
         gsonBuilder.registerTypeAdapter(Short.class, new NumberTypeAdapter(Short.class));
-        gsonBuilder.registerTypeAdapter(int.class, new NumberTypeAdapter(Integer.class));
+        gsonBuilder.registerTypeAdapter(int.class, new NumberTypeAdapter(int.class));
         gsonBuilder.registerTypeAdapter(Integer.class, new NumberTypeAdapter(Integer.class));
-        gsonBuilder.registerTypeAdapter(long.class, new NumberTypeAdapter(Long.class));
+        gsonBuilder.registerTypeAdapter(long.class, new NumberTypeAdapter(long.class));
         gsonBuilder.registerTypeAdapter(Long.class, new NumberTypeAdapter(Long.class));
-        gsonBuilder.registerTypeAdapter(float.class, new NumberTypeAdapter(Float.class));
+        gsonBuilder.registerTypeAdapter(float.class, new NumberTypeAdapter(float.class));
         gsonBuilder.registerTypeAdapter(Float.class, new NumberTypeAdapter(Float.class));
-        gsonBuilder.registerTypeAdapter(double.class, new NumberTypeAdapter(Double.class));
+        gsonBuilder.registerTypeAdapter(double.class, new NumberTypeAdapter(double.class));
         gsonBuilder.registerTypeAdapter(Double.class, new NumberTypeAdapter(Double.class));
         return gsonBuilder;
     }
