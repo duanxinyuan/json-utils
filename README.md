@@ -22,19 +22,33 @@ Json工具类，包含Gson、FastJson、Jackson三个库的工具类
   String testStr = GsonUtil.to(test);
 
   //获取JSON中的单个字符串
-  String name = GsonUtil.to(string,"name");
+  String name = GsonUtil.getString(string,"name");
+  
 ```
 
-```(java)
+## Fastjson使用示例：
+```java
 例：
+  //JSON解析
+  Test test = FastjsonUtil.from(string, Test.class);
+  
+  //JSON序列化
+  String testStr = FastjsonUtil.to(test);
 
-Gson：
-    GsonUtil.from()/GsonUtil.to()
-    
-FastjsonUtil：
-     FastjsonUtil.from()/FastjsonUtil.to()
+  //获取JSON中的单个字符串
+  String name = FastjsonUtil.getString(string,"name");
 
-JacksonUtil：
-    JacksonUtil.from()/JacksonUtil.to()
- 
+```
+
+## Jackson使用示例：
+```java
+  //JSON解析
+  Test test = JacksonUtil.from(string, Test.class);
+  
+  //JSON序列化
+  String testStr = JacksonUtil.to(test);
+
+  //获取JSON中的单个字符串
+  String name = JacksonUtil.getString(string,"name");
+
 ```
