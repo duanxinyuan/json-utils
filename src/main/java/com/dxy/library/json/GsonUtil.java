@@ -5,11 +5,12 @@
  */
 package com.dxy.library.json;
 
+import com.dxy.library.json.typeadapter.NumberTypeAdapter;
 import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.StringReader;
 import java.lang.reflect.Type;
@@ -18,14 +19,19 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 
 /**
- * Gson解析工具类
+ * Gson工具类
  * @author duanxinyuan
  * 2015/5/27 16:53
  */
 @Slf4j
 public class GsonUtil {
     private static Gson gson;
-    private static Gson exposeGson;
+
+    static {
+        GsonBuilder gsonBuilder = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss");
+        gsonBuilder = registTypeAdapter(gsonBuilder);
+        gson = gsonBuilder.create();
+    }
 
     /**
      * 格式化Json
@@ -36,51 +42,6 @@ public class GsonUtil {
         JsonParser jp = new JsonParser();
         JsonElement je = jp.parse(json);
         return gson.toJson(je);
-    }
-
-    /**
-     * json中对于Html的转义,new Gson()默认对Html进行转义，如果不想转义使用下面的方法
-     * @return gson
-     */
-    public Gson getHtmlGson() {
-        GsonBuilder gsonBuilder = new GsonBuilder();
-        gsonBuilder.disableHtmlEscaping();
-        gsonBuilder = registTypeAdapter(gsonBuilder);
-        return gsonBuilder.create();
-    }
-
-    /**
-     * json中日期格式的处理，使用该对象进行json的处理，如果出现日期Date类的对象，就会按照设置的格式进行处理
-     * @param format 时间格式
-     * @return gson
-     */
-    public static Gson getDateGson(String format) {
-        GsonBuilder gsonBuilder = new GsonBuilder();
-        gsonBuilder.setDateFormat(format);
-        gsonBuilder = registTypeAdapter(gsonBuilder);
-        return gsonBuilder.create();
-    }
-
-    public static Gson getGson() {
-        if (null == gson) {
-            synchronized (GsonUtil.class) {
-                if (gson == null) {
-                    GsonBuilder gsonBuilder = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss");
-                    gsonBuilder = registTypeAdapter(gsonBuilder);
-                    gson = gsonBuilder.create();
-                }
-            }
-        }
-        return gson;
-    }
-
-    public static Gson getExposeGson() {
-        if (null == exposeGson) {
-            GsonBuilder gsonBuilder = new GsonBuilder().excludeFieldsWithoutExposeAnnotation();
-            gsonBuilder = registTypeAdapter(gsonBuilder);
-            exposeGson = gsonBuilder.create();
-        }
-        return exposeGson;
     }
 
     private static GsonBuilder registTypeAdapter(GsonBuilder gsonBuilder) {
@@ -94,6 +55,7 @@ public class GsonUtil {
         gsonBuilder.registerTypeAdapter(Float.class, new NumberTypeAdapter(Float.class));
         gsonBuilder.registerTypeAdapter(double.class, new NumberTypeAdapter(double.class));
         gsonBuilder.registerTypeAdapter(Double.class, new NumberTypeAdapter(Double.class));
+        gsonBuilder.registerTypeAdapter(BigDecimal.class, new NumberTypeAdapter(BigDecimal.class));
         return gsonBuilder;
     }
 
@@ -101,28 +63,28 @@ public class GsonUtil {
      * JSON解析
      */
     public static <V> V from(Object jsonObj, Class<V> c) {
-        return getGson().fromJson(jsonObj.toString(), c);
+        return gson.fromJson(jsonObj.toString(), c);
     }
 
     /**
      * JSON解析
      */
     public static <V> V from(String json, Class<V> c) {
-        return getGson().fromJson(json, c);
+        return gson.fromJson(json, c);
     }
 
     /**
      * JSON解析
      */
     public static <V> V from(String json, Type type) {
-        return getGson().fromJson(json, type);
+        return gson.fromJson(json, type);
     }
 
     /**
      * JSON解析
      */
     public static <V> V from(String json, TypeToken<V> typeToken) {
-        return getGson().fromJson(json, typeToken.getType());
+        return gson.fromJson(json, typeToken.getType());
     }
 
     /**
@@ -131,7 +93,7 @@ public class GsonUtil {
     public static <V> V lenientFrom(Object jsonObj, Class<V> c) {
         JsonReader reader = new JsonReader(new StringReader(jsonObj.toString()));
         reader.setLenient(true);
-        return getGson().fromJson(reader, c);
+        return gson.fromJson(reader, c);
     }
 
     /**
@@ -140,7 +102,7 @@ public class GsonUtil {
     public static <V> V lenientFrom(String json, Class<V> c) {
         JsonReader reader = new JsonReader(new StringReader(json));
         reader.setLenient(true);
-        return getGson().fromJson(reader, c);
+        return gson.fromJson(reader, c);
     }
 
     /**
@@ -149,7 +111,7 @@ public class GsonUtil {
     public static <V> V lenientFrom(String json, Type type) {
         JsonReader reader = new JsonReader(new StringReader(json));
         reader.setLenient(true);
-        return getGson().fromJson(reader, type);
+        return gson.fromJson(reader, type);
     }
 
     /**
@@ -158,21 +120,21 @@ public class GsonUtil {
     public static <V> V lenientFrom(String json, TypeToken<V> typeToken) {
         JsonReader reader = new JsonReader(new StringReader(json));
         reader.setLenient(true);
-        return getGson().fromJson(reader, typeToken.getType());
+        return gson.fromJson(reader, typeToken.getType());
     }
 
     /**
      * 转化为JSON
      */
     public static <V> String to(ArrayList<V> list) {
-        return getGson().toJson(list);
+        return gson.toJson(list);
     }
 
     /**
      * 转化为JSON
      */
     public static <V> String to(V v) {
-        return getGson().toJson(v);
+        return gson.toJson(v);
     }
 
     /**
@@ -320,13 +282,13 @@ public class GsonUtil {
      * 从json串中获取某个字段
      * @return boolean，默认为false
      */
-    public static Byte getByte(String json, String key) {
+    public static Byte getBytes(String json, String key) {
         if (StringUtils.isEmpty(json)) {
             return null;
         }
         byte propertyValue;
         JsonElement jsonByKey = getJsonByKey(json, key);
-        if (jsonByKey == null || "null".equals(jsonByKey.toString()) || StringUtils.isEmpty(jsonByKey.toString())) {
+        if (jsonByKey == null) {
             return null;
         }
         propertyValue = jsonByKey.getAsByte();
@@ -383,15 +345,14 @@ public class GsonUtil {
      * 向json中添加属性
      * @return json
      */
-    private static <T> String add(JsonObject jsonObject, String key, T value) {
+    private static <T> void add(JsonObject jsonObject, String key, T value) {
         if (value instanceof String) {
             jsonObject.addProperty(key, (String) value);
-        } else if (value instanceof Integer || value instanceof Long) {
+        } else if (value instanceof Number) {
             jsonObject.addProperty(key, (Number) value);
         } else {
             jsonObject.addProperty(key, to(value));
         }
-        return jsonObject.toString();
     }
 
     /**

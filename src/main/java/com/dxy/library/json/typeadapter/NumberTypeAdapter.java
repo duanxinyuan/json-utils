@@ -1,13 +1,15 @@
-package com.dxy.library.json;
+package com.dxy.library.json.typeadapter;
 
 import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
-import org.apache.commons.lang.math.NumberUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 
 /**
+ * Gson解析的Number类型的字段解析适配器
  * @author duanxinyuan
  * 2018/6/20 14:58
  */
@@ -47,6 +49,8 @@ public class NumberTypeAdapter extends TypeAdapter<Number> {
                 return NumberUtils.toDouble(json);
             } else if (c == Double.class) {
                 return Double.parseDouble(json);
+            } else if (c == BigDecimal.class) {
+                return new BigDecimal(json);
             } else {
                 return Integer.parseInt(json);
             }
