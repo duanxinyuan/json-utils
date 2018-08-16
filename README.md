@@ -6,7 +6,7 @@ Json工具类, 包含Gson、FastJson、Jackson三个库的工具类
 <dependency>
     <groupId>com.github.duanxinyuan</groupId>
     <artifactId>library-json</artifactId>
-    <version>1.1.0</version>
+    <version>1.3.0</version>
 </dependency>
 ```
 
@@ -20,6 +20,9 @@ Json工具类, 包含Gson、FastJson、Jackson三个库的工具类
   
   //JSON序列化
   String testStr = GsonUtil.to(test);
+  
+  //JSON格式化
+  String testStr = GsonUtil.format(test);
 
   //获取JSON中的单个字符串
   String name = GsonUtil.getString(string,"name");
@@ -32,6 +35,9 @@ Json工具类, 包含Gson、FastJson、Jackson三个库的工具类
   //JSON解析
   Test test = FastjsonUtil.from(string, Test.class);
   
+  //JSON格式化
+  String testStr = FastjsonUtil.format(test);
+
   //JSON序列化
   String testStr = FastjsonUtil.to(test);
 
@@ -44,7 +50,10 @@ Json工具类, 包含Gson、FastJson、Jackson三个库的工具类
 ```java
   //JSON解析
   Test test = JacksonUtil.from(string, Test.class);
-  
+   
+  //JSON格式化
+  String testStr = JacksonUtil.format(test);
+
   //JSON序列化
   String testStr = JacksonUtil.to(test);
 
