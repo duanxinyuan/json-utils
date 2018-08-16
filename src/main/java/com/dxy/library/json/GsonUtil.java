@@ -29,22 +29,11 @@ public class GsonUtil {
 
     static {
         GsonBuilder gsonBuilder = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss");
-        gsonBuilder = registTypeAdapter(gsonBuilder);
+        registTypeAdapter(gsonBuilder);
         gson = gsonBuilder.create();
     }
 
-    /**
-     * 格式化Json
-     * @return json
-     */
-    public static String formatJson(String json) {
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        JsonParser jp = new JsonParser();
-        JsonElement je = jp.parse(json);
-        return gson.toJson(je);
-    }
-
-    private static GsonBuilder registTypeAdapter(GsonBuilder gsonBuilder) {
+    private static void registTypeAdapter(GsonBuilder gsonBuilder) {
         gsonBuilder.registerTypeAdapter(short.class, new NumberTypeAdapter(short.class));
         gsonBuilder.registerTypeAdapter(Short.class, new NumberTypeAdapter(Short.class));
         gsonBuilder.registerTypeAdapter(int.class, new NumberTypeAdapter(int.class));
@@ -56,7 +45,6 @@ public class GsonUtil {
         gsonBuilder.registerTypeAdapter(double.class, new NumberTypeAdapter(double.class));
         gsonBuilder.registerTypeAdapter(Double.class, new NumberTypeAdapter(Double.class));
         gsonBuilder.registerTypeAdapter(BigDecimal.class, new NumberTypeAdapter(BigDecimal.class));
-        return gsonBuilder;
     }
 
     /**
@@ -173,7 +161,7 @@ public class GsonUtil {
         try {
             return jsonByKey.getAsInt();
         } catch (Exception e) {
-            log.error("从json串中获取字段失败，Json内容：{}，Key：{}", json, key, e);
+            log.error("从json串中获取字段失败, Json内容: {}, Key: {}", json, key, e);
             return null;
         }
     }
@@ -193,7 +181,7 @@ public class GsonUtil {
         try {
             return jsonByKey.getAsLong();
         } catch (Exception e) {
-            log.error("从json串中获取字段失败，Json内容：{}，Key：{}", json, key, e);
+            log.error("从json串中获取字段失败, Json内容: {}, Key: {}", json, key, e);
             return null;
         }
     }
@@ -213,7 +201,7 @@ public class GsonUtil {
         try {
             return jsonByKey.getAsDouble();
         } catch (Exception e) {
-            log.error("从json串中获取字段失败，Json内容：{}，Key：{}", json, key, e);
+            log.error("从json串中获取字段失败, Json内容: {}, Key: {}", json, key, e);
             return null;
         }
     }
@@ -233,7 +221,7 @@ public class GsonUtil {
         try {
             return jsonByKey.getAsBigInteger();
         } catch (Exception e) {
-            log.error("从json串中获取字段失败，Json内容：{}，Key：{}", json, key, e);
+            log.error("从json串中获取字段失败, Json内容: {}, Key: {}", json, key, e);
             return null;
         }
     }
@@ -253,14 +241,14 @@ public class GsonUtil {
         try {
             return jsonByKey.getAsBigDecimal();
         } catch (Exception e) {
-            log.error("从json串中获取字段失败，Json内容：{}，Key：{}", json, key, e);
+            log.error("从json串中获取字段失败, Json内容: {}, Key: {}", json, key, e);
             return null;
         }
     }
 
     /**
      * 从json串中获取某个字段
-     * @return boolean，默认为false
+     * @return boolean, 默认为false
      */
     public static boolean getBoolean(String json, String key) {
         if (StringUtils.isEmpty(json)) {
@@ -273,14 +261,14 @@ public class GsonUtil {
         try {
             return jsonByKey.getAsBoolean();
         } catch (Exception e) {
-            log.error("从json串中获取字段失败，Json内容：{}，Key：{}", json, key, e);
+            log.error("从json串中获取字段失败, Json内容: {}, Key: {}", json, key, e);
             return false;
         }
     }
 
     /**
      * 从json串中获取某个字段
-     * @return boolean，默认为false
+     * @return boolean, 默认为false
      */
     public static Byte getBytes(String json, String key) {
         if (StringUtils.isEmpty(json)) {
@@ -297,7 +285,7 @@ public class GsonUtil {
 
     /**
      * 从json串中获取某个字段
-     * @return boolean，默认为false
+     * @return boolean, 默认为false
      */
     public static <T> ArrayList<T> getList(String json, String key) {
         if (StringUtils.isEmpty(json)) {
@@ -310,7 +298,7 @@ public class GsonUtil {
                 JsonArray jsonArray = jsonByKey.getAsJsonArray();
                 ts = from(jsonArray.toString(), new TypeToken<ArrayList<T>>() {});
             } catch (Exception e) {
-                log.error("从json串中获取数组失败，Json内容：{}，Key：{}", json, key, e);
+                log.error("从json串中获取数组失败, Json内容: {}, Key: {}", json, key, e);
             }
         }
         return ts;
@@ -322,7 +310,7 @@ public class GsonUtil {
         try {
             element = jsonParser.parse(json);
         } catch (JsonSyntaxException e) {
-            log.error("从json串中获取字段失败，Json内容：{}，Key：{}", json, key, e);
+            log.error("从json串中获取字段失败, Json内容: {}, Key: {}", json, key, e);
             return null;
         }
         JsonObject jsonObj = element.getAsJsonObject();
@@ -343,7 +331,6 @@ public class GsonUtil {
 
     /**
      * 向json中添加属性
-     * @return json
      */
     private static <T> void add(JsonObject jsonObject, String key, T value) {
         if (value instanceof String) {
@@ -380,6 +367,17 @@ public class GsonUtil {
     }
 
     /**
+     * 格式化Json(美化)
+     * @return json
+     */
+    public static String format(String json) {
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        JsonParser jp = new JsonParser();
+        JsonElement je = jp.parse(json);
+        return gson.toJson(je);
+    }
+
+    /**
      * 判断字符串是否是json
      * @return json
      */
@@ -387,8 +385,9 @@ public class GsonUtil {
         try {
             return new JsonParser().parse(json).isJsonObject();
         } catch (Exception e) {
-            log.error("判断字符串是否是json失败，Json内容：{}", json, e);
+            log.error("判断字符串是否是json失败, Json内容: {}", json, e);
             return false;
         }
     }
+
 }

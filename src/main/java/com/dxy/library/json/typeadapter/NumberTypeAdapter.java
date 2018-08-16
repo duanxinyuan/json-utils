@@ -26,7 +26,7 @@ public class NumberTypeAdapter extends TypeAdapter<Number> {
     }
 
     @Override
-    public Number read(JsonReader jsonReader) throws IOException {
+    public Number read(JsonReader jsonReader) {
         try {
             String json = jsonReader.nextString();
             if (c == short.class) {

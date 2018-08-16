@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
@@ -70,7 +71,7 @@ public class FastjsonUtl {
         try {
             return jsonObject.getString(key);
         } catch (Exception e) {
-            log.error("从json串中获取字段失败，Json内容：{}，Key：{}", json, key, e);
+            log.error("从json串中获取字段失败, Json内容: {}, Key: {}", json, key, e);
             return null;
         }
     }
@@ -90,7 +91,7 @@ public class FastjsonUtl {
         try {
             return jsonObject.getInteger(key);
         } catch (Exception e) {
-            log.error("从json串中获取字段失败，Json内容：{}，Key：{}", json, key, e);
+            log.error("从json串中获取字段失败, Json内容: {}, Key: {}", json, key, e);
             return null;
         }
     }
@@ -110,7 +111,7 @@ public class FastjsonUtl {
         try {
             return jsonObject.getLong(key);
         } catch (Exception e) {
-            log.error("从json串中获取字段失败，Json内容：{}，Key：{}", json, key, e);
+            log.error("从json串中获取字段失败, Json内容: {}, Key: {}", json, key, e);
             return null;
         }
     }
@@ -130,7 +131,7 @@ public class FastjsonUtl {
         try {
             return jsonObject.getDouble(key);
         } catch (Exception e) {
-            log.error("从json串中获取字段失败，Json内容：{}，Key：{}", json, key, e);
+            log.error("从json串中获取字段失败, Json内容: {}, Key: {}", json, key, e);
             return null;
         }
     }
@@ -150,7 +151,7 @@ public class FastjsonUtl {
         try {
             return jsonObject.getBigInteger(key);
         } catch (Exception e) {
-            log.error("从json串中获取字段失败，Json内容：{}，Key：{}", json, key, e);
+            log.error("从json串中获取字段失败, Json内容: {}, Key: {}", json, key, e);
             return null;
         }
     }
@@ -170,14 +171,14 @@ public class FastjsonUtl {
         try {
             return jsonObject.getBigDecimal(key);
         } catch (Exception e) {
-            log.error("从json串中获取字段失败，Json内容：{}，Key：{}", json, key, e);
+            log.error("从json串中获取字段失败, Json内容: {}, Key: {}", json, key, e);
             return null;
         }
     }
 
     /**
      * 从json串中获取某个字段
-     * @return boolean，默认为false
+     * @return boolean, 默认为false
      */
     public static boolean getBoolean(String json, String key) {
         if (StringUtils.isEmpty(json)) {
@@ -190,14 +191,14 @@ public class FastjsonUtl {
         try {
             return jsonObject.getBooleanValue(key);
         } catch (Exception e) {
-            log.error("从json串中获取字段失败，Json内容：{}，Key：{}", json, key, e);
+            log.error("从json串中获取字段失败, Json内容: {}, Key: {}", json, key, e);
             return false;
         }
     }
 
     /**
      * 从json串中获取某个字段
-     * @return boolean，默认为false
+     * @return boolean, 默认为false
      */
     public static Byte getByte(String json, String key) {
         if (StringUtils.isEmpty(json)) {
@@ -212,7 +213,7 @@ public class FastjsonUtl {
 
     /**
      * 从json串中获取某个字段
-     * @return boolean，默认为false
+     * @return boolean, 默认为false
      */
     public static <T> List<T> getList(String json, String key, Class<T> c) {
         if (StringUtils.isEmpty(json)) {
@@ -225,7 +226,7 @@ public class FastjsonUtl {
                 JSONArray jsonArray = jsonObject.getJSONArray(key);
                 ts = jsonArray.toJavaList(c);
             } catch (Exception e) {
-                log.error("从json串中获取数组失败，Json内容：{}，Key：{}", json, key, e);
+                log.error("从json串中获取数组失败, Json内容: {}, Key: {}", json, key, e);
             }
         }
         return ts;
@@ -243,7 +244,6 @@ public class FastjsonUtl {
 
     /**
      * 向json中添加属性
-     * @return json
      */
     private static <T> void add(JSONObject jsonObject, String key, T value) {
         if (value instanceof String || value instanceof Number || value instanceof Boolean || value instanceof Byte[]) {
@@ -271,6 +271,14 @@ public class FastjsonUtl {
         add(jsonObject, key, value);
         return jsonObject.toString();
     }
+    /**
+     * 格式化Json(美化)
+     * @return json
+     */
+    public static String format(String json){
+        JSONObject jsonObject = JSONObject.parseObject(json);
+        return JSON.toJSONString(jsonObject, SerializerFeature.PrettyFormat);
+    }
 
     /**
      * 判断字符串是否是json
@@ -281,7 +289,7 @@ public class FastjsonUtl {
             JSON.parse(json);
             return true;
         } catch (Exception e) {
-            log.error("判断字符串是否是json失败，Json内容：{}", json, e);
+            log.error("判断字符串是否是json失败, Json内容: {}", json, e);
             return false;
         }
     }

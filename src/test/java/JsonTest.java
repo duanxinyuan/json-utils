@@ -20,6 +20,7 @@ public class JsonTest {
         System.out.println(GsonUtil.getBoolean(gsonStr, "isMan"));
         System.out.println(GsonUtil.getBigDecimal(gsonStr, "money"));
         System.out.println(GsonUtil.getList(gsonStr, "trait"));
+        System.out.println(GsonUtil.format(gsonStr));
         Person from = GsonUtil.from(gsonStr, Person.class);
         System.out.println(from);
         Person lenientFrom = GsonUtil.lenientFrom(gsonStr, Person.class);
@@ -37,6 +38,7 @@ public class JsonTest {
         System.out.println(FastjsonUtl.getBoolean(fastjsonStr, "isMan"));
         System.out.println(FastjsonUtl.getBigDecimal(fastjsonStr, "money"));
         System.out.println(FastjsonUtl.getList(fastjsonStr, "trait", String.class));
+        System.out.println(FastjsonUtl.format(fastjsonStr));
         Person from = FastjsonUtl.from(fastjsonStr, Person.class);
         System.out.println(from);
     }
@@ -52,6 +54,7 @@ public class JsonTest {
         System.out.println(JacksonUtil.getBoolean(jacksonStr, "isMan"));
         System.out.println(JacksonUtil.getBigDecimal(jacksonStr, "money"));
         System.out.println(JacksonUtil.getList(jacksonStr, "trait"));
+        System.out.println(JacksonUtil.format(jacksonStr));
         Person from = JacksonUtil.from(jacksonStr, Person.class);
         System.out.println(from);
     }

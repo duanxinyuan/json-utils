@@ -43,7 +43,7 @@ public class JacksonUtil {
         //为null的属性值不映射
         mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
 
-        //序列化BigDecimal时之间输出原始数字还是科学计数，默认false，即是否以toPlainString()科学计数方式来输出
+        //序列化BigDecimal时之间输出原始数字还是科学计数, 默认false, 即是否以toPlainString()科学计数方式来输出
         mapper.enable(JsonGenerator.Feature.WRITE_BIGDECIMAL_AS_PLAIN);
         //允许将JSON空字符串强制转换为null对象值
         mapper.enable(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT);
@@ -51,9 +51,9 @@ public class JacksonUtil {
         //允许单个数值当做数组处理
         mapper.enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY);
 
-        //禁止重复键，抛出异常
+        //禁止重复键, 抛出异常
         mapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
-        //禁止使用int代表Enum的order()來反序列化Enum，抛出异常
+        //禁止使用int代表Enum的order()來反序列化Enum, 抛出异常
         mapper.enable(DeserializationFeature.FAIL_ON_NUMBERS_FOR_ENUMS);
         //有属性不能映射的时候不报错
         mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
@@ -62,8 +62,6 @@ public class JacksonUtil {
         //对象为空时不抛异常
         mapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
 
-        //是否缩放排列输出，默认false，有些场合为了便于排版阅读则需要对输出做缩放排列
-        mapper.enable(SerializationFeature.INDENT_OUTPUT);
         //允许在JSON中使用c/c++风格注释
         mapper.enable(JsonParser.Feature.ALLOW_COMMENTS);
         //强制转义非ascii字符
@@ -82,6 +80,20 @@ public class JacksonUtil {
         //识别Guava类
         mapper.registerModule(new GuavaModule());
     }
+
+    /**
+     * 设置是否开启JSON格式美化
+     * @param isEnable 为true表示开启
+     */
+    public static void setIndentOutputEnable(boolean isEnable) {
+        if (isEnable) {
+            //是否缩放排列输出, 默认false, 有些场合为了便于排版阅读则需要对输出做缩放排列
+            mapper.enable(SerializationFeature.INDENT_OUTPUT);
+        } else {
+            mapper.disable(SerializationFeature.INDENT_OUTPUT);
+        }
+    }
+
 
     /**
      * JSON解析
@@ -271,7 +283,7 @@ public class JacksonUtil {
 
     /**
      * 从json串中获取某个字段
-     * @return boolean，默认为false
+     * @return boolean, 默认为false
      */
     public static boolean getBoolean(String json, String key) {
         if (StringUtils.isEmpty(json)) {
@@ -292,7 +304,7 @@ public class JacksonUtil {
 
     /**
      * 从json串中获取某个字段
-     * @return boolean，默认为false
+     * @return boolean, 默认为false
      */
     public static byte[] getByte(String json, String key) {
         if (StringUtils.isEmpty(json)) {
@@ -313,7 +325,7 @@ public class JacksonUtil {
 
     /**
      * 从json串中获取某个字段
-     * @return boolean，默认为false
+     * @return boolean, 默认为false
      */
     public static <T> ArrayList<T> getList(String json, String key) {
         if (StringUtils.isEmpty(json)) {
@@ -340,7 +352,6 @@ public class JacksonUtil {
 
     /**
      * 向json中添加属性
-     * @return json
      */
     private static <T> void add(JsonNode jsonNode, String key, T value) {
         if (value instanceof String) {
@@ -399,6 +410,20 @@ public class JacksonUtil {
     }
 
     /**
+     * 格式化Json(美化)
+     * @return json
+     */
+    public static String format(String json) {
+        try {
+            JsonNode node = mapper.readTree(json);
+            return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(node);
+        } catch (IOException e) {
+            log.error("格式化json失败, Json内容: {}", json, e);
+            return json;
+        }
+    }
+
+    /**
      * 判断字符串是否是json
      * @return json
      */
@@ -407,7 +432,7 @@ public class JacksonUtil {
             mapper.readTree(json);
             return true;
         } catch (Exception e) {
-            log.error("判断字符串是否是json失败，Json内容：{}", json, e);
+            log.error("判断字符串是否是json失败, Json内容: {}", json, e);
             return false;
         }
     }
