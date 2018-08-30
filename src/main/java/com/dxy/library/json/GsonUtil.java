@@ -29,6 +29,7 @@ public class GsonUtil {
 
     static {
         GsonBuilder gsonBuilder = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss");
+        gsonBuilder.disableHtmlEscaping();//禁止将部分特殊字符转义为unicode编码
         registTypeAdapter(gsonBuilder);
         gson = gsonBuilder.create();
     }
