@@ -1,4 +1,4 @@
-package com.dxy.library.json.typeadapter;
+package com.dxy.library.json.gson.adapter;
 
 import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;

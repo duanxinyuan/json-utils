@@ -1,7 +1,16 @@
-import com.dxy.library.json.FastjsonUtl;
-import com.dxy.library.json.GsonUtil;
-import com.dxy.library.json.JacksonUtil;
+import com.dxy.library.json.fastjson.FastjsonUtil;
+import com.dxy.library.json.gson.GsonUtil;
+import com.dxy.library.json.jackson.JacksonUtil;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
+import com.google.gson.reflect.TypeToken;
 import org.junit.Test;
+
+import java.time.Clock;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * @author duanxinyuan
@@ -17,7 +26,7 @@ public class JsonTest {
         System.out.println(gsonStr);
         System.out.println(GsonUtil.getString(gsonStr, "name"));
         System.out.println(GsonUtil.getInt(gsonStr, "age"));
-        System.out.println(GsonUtil.getBoolean(gsonStr, "isMan"));
+        System.out.println(GsonUtil.getBoolean(gsonStr, "man"));
         System.out.println(GsonUtil.getBigDecimal(gsonStr, "money"));
         System.out.println(GsonUtil.getList(gsonStr, "trait"));
         System.out.println(GsonUtil.format(gsonStr));
@@ -31,15 +40,15 @@ public class JsonTest {
     public void testFastjson() {
         Person person = Person.newPerson();
 
-        String fastjsonStr = FastjsonUtl.to(person);
+        String fastjsonStr = FastjsonUtil.to(person);
         System.out.println(fastjsonStr);
-        System.out.println(FastjsonUtl.getString(fastjsonStr, "name"));
-        System.out.println(FastjsonUtl.getInt(fastjsonStr, "age"));
-        System.out.println(FastjsonUtl.getBoolean(fastjsonStr, "isMan"));
-        System.out.println(FastjsonUtl.getBigDecimal(fastjsonStr, "money"));
-        System.out.println(FastjsonUtl.getList(fastjsonStr, "trait", String.class));
-        System.out.println(FastjsonUtl.format(fastjsonStr));
-        Person from = FastjsonUtl.from(fastjsonStr, Person.class);
+        System.out.println(FastjsonUtil.getString(fastjsonStr, "name"));
+        System.out.println(FastjsonUtil.getInt(fastjsonStr, "age"));
+        System.out.println(FastjsonUtil.getBoolean(fastjsonStr, "man"));
+        System.out.println(FastjsonUtil.getBigDecimal(fastjsonStr, "money"));
+        System.out.println(FastjsonUtil.getList(fastjsonStr, "trait", String.class));
+        System.out.println(FastjsonUtil.format(fastjsonStr));
+        Person from = FastjsonUtil.from(fastjsonStr, Person.class);
         System.out.println(from);
     }
 
@@ -51,12 +60,166 @@ public class JsonTest {
         System.out.println(jacksonStr);
         System.out.println(JacksonUtil.getString(jacksonStr, "name"));
         System.out.println(JacksonUtil.getInt(jacksonStr, "age"));
-        System.out.println(JacksonUtil.getBoolean(jacksonStr, "isMan"));
+        System.out.println(JacksonUtil.getBoolean(jacksonStr, "man"));
         System.out.println(JacksonUtil.getBigDecimal(jacksonStr, "money"));
         System.out.println(JacksonUtil.getList(jacksonStr, "trait"));
         System.out.println(JacksonUtil.format(jacksonStr));
         Person from = JacksonUtil.from(jacksonStr, Person.class);
-        System.out.println(from);
+        System.out.println(JacksonUtil.to(from));
+
+        Person yamlPerson = JacksonUtil.fromYamlRecource("test.yml", Person.class);
+        System.out.println("yamlPerson: " + JacksonUtil.to(yamlPerson));
+
+        Person propPerson = JacksonUtil.fromPropRecource("test.properties", Person.class);
+        System.out.println("propPerson: " + JacksonUtil.to(propPerson));
+
+        List<Person> csvPerson = JacksonUtil.fromCsvRecource("test.csv", "\t", Person.class);
+        System.out.println("csvPerson: " + JacksonUtil.to(csvPerson));
+
+        Person xmlPerson = JacksonUtil.fromXmlRecource("test.xml", Person.class);
+        System.out.println("xmlPerson: " + JacksonUtil.to(xmlPerson));
+    }
+
+    /**
+     * 速度测试
+     * 结果：
+     * 数据量大于2万，gson序列化速度最快，大于百万
+     */
+    @Test
+    public void testSpeed() {
+        ImmutableList<Integer> sizes = ImmutableList.of(200, 1000, 5000, 10000, 50000);
+//        ImmutableList<Integer> sizes = ImmutableList.of(5000);
+        //取值次数
+        int count = 1;
+        for (Integer size : sizes) {
+            testTo(size, count);
+            testFrom(size, count);
+            testFromTo(size, count);
+        }
+    }
+
+
+    /**
+     * Json序列化速度对比测试
+     */
+    public void testTo(int size, int count) {
+        List<HashMap<String, Object>> hashMapList = getHashMapList(size);
+        ArrayList<Long> gsonTos = Lists.newArrayList();
+
+        ArrayList<Long> jacksonTos = Lists.newArrayList();
+
+        ArrayList<Long> fastjsonTos = Lists.newArrayList();
+        //取平均值
+        for (int i = 0; i < count; i++) {
+            long startToGson = Clock.systemUTC().millis();
+            GsonUtil.to(hashMapList);
+            long endToGson = Clock.systemUTC().millis();
+            gsonTos.add(endToGson - startToGson);
+
+
+            long startToJackson = Clock.systemUTC().millis();
+            JacksonUtil.to(hashMapList);
+            long endToJackson = Clock.systemUTC().millis();
+            jacksonTos.add(endToJackson - startToJackson);
+
+            long startToFastjson = Clock.systemUTC().millis();
+            FastjsonUtil.to(hashMapList);
+            long endToFastjson = Clock.systemUTC().millis();
+            fastjsonTos.add(endToFastjson - startToFastjson);
+        }
+
+        System.out.println("size: " + size + ", to, gson: " + average(gsonTos) + ", jackson: " + average(jacksonTos) + ", fastjson: " + average(fastjsonTos));
+    }
+
+
+    /**
+     * Json反序列化速度对比测试
+     */
+    public void testFrom(int size, int count) {
+        List<HashMap<String, Object>> hashMapList = getHashMapList(size);
+        ArrayList<Long> gsonFroms = Lists.newArrayList();
+        ArrayList<Long> jacksonFroms = Lists.newArrayList();
+        ArrayList<Long> fastjsonFroms = Lists.newArrayList();
+        String to = GsonUtil.to(hashMapList);
+        //取平均值
+        for (int i = 0; i < count; i++) {
+            long startFromGson = Clock.systemUTC().millis();
+            GsonUtil.from(to, new TypeToken<ArrayList<Event>>() {});
+            long endFromGson = Clock.systemUTC().millis();
+            gsonFroms.add(endFromGson - startFromGson);
+
+            long startFromJackson = Clock.systemUTC().millis();
+            JacksonUtil.from(to, new TypeReference<ArrayList<Event>>() {});
+            long endFromJackson = Clock.systemUTC().millis();
+            jacksonFroms.add(endFromJackson - startFromJackson);
+
+            long startFromFastjson = Clock.systemUTC().millis();
+            FastjsonUtil.from(to, new com.alibaba.fastjson.TypeReference<ArrayList<Event>>() {});
+            long endFromFastjson = Clock.systemUTC().millis();
+            fastjsonFroms.add(endFromFastjson - startFromFastjson);
+        }
+        System.out.println("size: " + size + ", from, gson: " + average(gsonFroms) + ", jackson: " + average(jacksonFroms) + ", fastjson: " + average(fastjsonFroms));
+    }
+
+
+    /**
+     * Json序列化和反序列化混合速度对比测试
+     */
+    public void testFromTo(int size, int count) {
+        List<HashMap<String, Object>> hashMapList = getHashMapList(size);
+        ArrayList<Long> gsonFromSingles = Lists.newArrayList();
+        ArrayList<Long> jacksonFromSingles = Lists.newArrayList();
+        ArrayList<Long> fastjsonFromSingles = Lists.newArrayList();
+        //取平均值
+        for (int i = 0; i < count; i++) {
+            long startFromSingleGson = Clock.systemUTC().millis();
+            List<Event> eventListGson = Lists.newArrayList();
+            for (HashMap<String, Object> map : hashMapList) {
+                eventListGson.add(GsonUtil.from(GsonUtil.to(map), Event.class));
+            }
+            long endFromSingleGson = Clock.systemUTC().millis();
+            gsonFromSingles.add(endFromSingleGson - startFromSingleGson);
+
+            long startFromSingleJackson = Clock.systemUTC().millis();
+            List<Event> eventListJackson = Lists.newArrayList();
+            for (HashMap<String, Object> map : hashMapList) {
+                eventListJackson.add(JacksonUtil.from(JacksonUtil.to(map), Event.class));
+            }
+            long endFromSingleJackson = Clock.systemUTC().millis();
+            jacksonFromSingles.add(endFromSingleJackson - startFromSingleJackson);
+
+            long startFromSingleFastjson = Clock.systemUTC().millis();
+            List<Event> eventListFastjson = Lists.newArrayList();
+            for (HashMap<String, Object> map : hashMapList) {
+                eventListFastjson.add(FastjsonUtil.from(FastjsonUtil.to(map), Event.class));
+            }
+            long endFromSingleFastjson = Clock.systemUTC().millis();
+            fastjsonFromSingles.add(endFromSingleFastjson - startFromSingleFastjson);
+        }
+
+        System.out.println("size: " + size + ", from single, gson: " + average(gsonFromSingles) + ", jackson: " + average(jacksonFromSingles) + ", fastjson: " + average(fastjsonFromSingles));
+    }
+
+    public List<HashMap<String, Object>> getHashMapList(int size) {
+        List<HashMap<String, Object>> hashMapList = Lists.newArrayList();
+        for (int i = 0; i < size; i++) {
+            HashMap<String, Object> map = new HashMap<>();
+            map.put("id", "AWJSIFlnwyY7hXLEWwBN");
+            map.put("event_name", "startApp");
+            hashMapList.add(map);
+        }
+        return hashMapList;
+    }
+
+    //计算平均数
+    public static double average(List<Long> list) {
+        long sum = 0;
+        //遍历求和
+        for (Long i : list) {
+            sum += i;
+        }
+        //除以人数，计算平均值
+        return (double) sum / list.size();
     }
 
 }

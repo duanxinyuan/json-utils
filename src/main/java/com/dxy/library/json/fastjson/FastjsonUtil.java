@@ -1,4 +1,4 @@
-package com.dxy.library.json;
+package com.dxy.library.json.fastjson;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
@@ -15,11 +15,12 @@ import java.util.List;
 
 /**
  * Fastjson工具类
+ * 优势：数据量大（高于万）的时候速度有绝对优势，API简洁
  * @author duanxinyuan
  * 2018/6/28 22:55
  */
 @Slf4j
-public class FastjsonUtl {
+public class FastjsonUtil {
 
     /**
      * JSON解析
@@ -38,8 +39,8 @@ public class FastjsonUtl {
     /**
      * JSON解析
      */
-    public static <V> V from(String json, TypeReference<V> typeToken) {
-        return JSON.parseObject(json, typeToken.getType());
+    public static <V> V from(String json, TypeReference<V> typeReference) {
+        return JSON.parseObject(json, typeReference.getType());
     }
 
     /**
@@ -71,7 +72,7 @@ public class FastjsonUtl {
         try {
             return jsonObject.getString(key);
         } catch (Exception e) {
-            log.error("从json串中获取字段失败, Json内容: {}, Key: {}", json, key, e);
+            log.error("fastjson get string error, json: {}, key: {}", json, key, e);
             return null;
         }
     }
@@ -91,7 +92,7 @@ public class FastjsonUtl {
         try {
             return jsonObject.getInteger(key);
         } catch (Exception e) {
-            log.error("从json串中获取字段失败, Json内容: {}, Key: {}", json, key, e);
+            log.error("fastjson get int error, json: {}, key: {}", json, key, e);
             return null;
         }
     }
@@ -111,7 +112,7 @@ public class FastjsonUtl {
         try {
             return jsonObject.getLong(key);
         } catch (Exception e) {
-            log.error("从json串中获取字段失败, Json内容: {}, Key: {}", json, key, e);
+            log.error("fastjson get long error, json: {}, key: {}", json, key, e);
             return null;
         }
     }
@@ -131,7 +132,7 @@ public class FastjsonUtl {
         try {
             return jsonObject.getDouble(key);
         } catch (Exception e) {
-            log.error("从json串中获取字段失败, Json内容: {}, Key: {}", json, key, e);
+            log.error("fastjson get double error, json: {}, key: {}", json, key, e);
             return null;
         }
     }
@@ -151,7 +152,7 @@ public class FastjsonUtl {
         try {
             return jsonObject.getBigInteger(key);
         } catch (Exception e) {
-            log.error("从json串中获取字段失败, Json内容: {}, Key: {}", json, key, e);
+            log.error("fastjson get biginteger error, json: {}, key: {}", json, key, e);
             return null;
         }
     }
@@ -171,7 +172,7 @@ public class FastjsonUtl {
         try {
             return jsonObject.getBigDecimal(key);
         } catch (Exception e) {
-            log.error("从json串中获取字段失败, Json内容: {}, Key: {}", json, key, e);
+            log.error("fastjson get bigdecimal error, json: {}, key: {}", json, key, e);
             return null;
         }
     }
@@ -191,7 +192,7 @@ public class FastjsonUtl {
         try {
             return jsonObject.getBooleanValue(key);
         } catch (Exception e) {
-            log.error("从json串中获取字段失败, Json内容: {}, Key: {}", json, key, e);
+            log.error("fastjson get boolean error, json: {}, key: {}", json, key, e);
             return false;
         }
     }
@@ -226,7 +227,7 @@ public class FastjsonUtl {
                 JSONArray jsonArray = jsonObject.getJSONArray(key);
                 ts = jsonArray.toJavaList(c);
             } catch (Exception e) {
-                log.error("从json串中获取数组失败, Json内容: {}, Key: {}", json, key, e);
+                log.error("fastjson get list error, json: {}, key: {}", json, key, e);
             }
         }
         return ts;
@@ -271,11 +272,12 @@ public class FastjsonUtl {
         add(jsonObject, key, value);
         return jsonObject.toString();
     }
+
     /**
      * 格式化Json(美化)
      * @return json
      */
-    public static String format(String json){
+    public static String format(String json) {
         JSONObject jsonObject = JSONObject.parseObject(json);
         return JSON.toJSONString(jsonObject, SerializerFeature.PrettyFormat);
     }
@@ -289,7 +291,7 @@ public class FastjsonUtl {
             JSON.parse(json);
             return true;
         } catch (Exception e) {
-            log.error("判断字符串是否是json失败, Json内容: {}", json, e);
+            log.error("fastjson check json error, json: {}", json, e);
             return false;
         }
     }

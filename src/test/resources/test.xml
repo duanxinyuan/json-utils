@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<person>
+    <name>张三</name>
+    <date>2018-08-09 15:45:00</date>
+    <localDateTime>2018-08-09T15:45:00</localDateTime>
+    <age>100</age>
+    <money>500.21</money>
+    <trait>
+        <trait>淡然</trait>
+        <trait>温和</trait>
+    </trait>
+    <cards>
+        <身份证>4a6d456as</身份证>
+        <建行卡>649874545</建行卡>
+    </cards>
+
+</person>

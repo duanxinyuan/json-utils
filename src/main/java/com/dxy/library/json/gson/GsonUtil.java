@@ -3,9 +3,9 @@
  * http://blog.csdn.net/qq_20698023
  * Dye-段新原
  */
-package com.dxy.library.json;
+package com.dxy.library.json.gson;
 
-import com.dxy.library.json.typeadapter.NumberTypeAdapter;
+import com.dxy.library.json.gson.adapter.NumberTypeAdapter;
 import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
@@ -20,6 +20,7 @@ import java.util.ArrayList;
 
 /**
  * Gson工具类
+ * 优势：数据量小（低于万）的时候速度有绝对优势
  * @author duanxinyuan
  * 2015/5/27 16:53
  */
@@ -162,7 +163,7 @@ public class GsonUtil {
         try {
             return jsonByKey.getAsInt();
         } catch (Exception e) {
-            log.error("从json串中获取字段失败, Json内容: {}, Key: {}", json, key, e);
+            log.error("gson get int error, json: {}, key: {}", json, key, e);
             return null;
         }
     }
@@ -182,7 +183,7 @@ public class GsonUtil {
         try {
             return jsonByKey.getAsLong();
         } catch (Exception e) {
-            log.error("从json串中获取字段失败, Json内容: {}, Key: {}", json, key, e);
+            log.error("gson get long error, json: {}, key: {}", json, key, e);
             return null;
         }
     }
@@ -202,7 +203,7 @@ public class GsonUtil {
         try {
             return jsonByKey.getAsDouble();
         } catch (Exception e) {
-            log.error("从json串中获取字段失败, Json内容: {}, Key: {}", json, key, e);
+            log.error("gson get double error, json: {}, key: {}", json, key, e);
             return null;
         }
     }
@@ -222,7 +223,7 @@ public class GsonUtil {
         try {
             return jsonByKey.getAsBigInteger();
         } catch (Exception e) {
-            log.error("从json串中获取字段失败, Json内容: {}, Key: {}", json, key, e);
+            log.error("gson get biginteger error, json: {}, key: {}", json, key, e);
             return null;
         }
     }
@@ -242,7 +243,7 @@ public class GsonUtil {
         try {
             return jsonByKey.getAsBigDecimal();
         } catch (Exception e) {
-            log.error("从json串中获取字段失败, Json内容: {}, Key: {}", json, key, e);
+            log.error("gson get bigdecimal error, json: {}, key: {}", json, key, e);
             return null;
         }
     }
@@ -262,7 +263,7 @@ public class GsonUtil {
         try {
             return jsonByKey.getAsBoolean();
         } catch (Exception e) {
-            log.error("从json串中获取字段失败, Json内容: {}, Key: {}", json, key, e);
+            log.error("gson get boolean error, json: {}, key: {}", json, key, e);
             return false;
         }
     }
@@ -299,7 +300,7 @@ public class GsonUtil {
                 JsonArray jsonArray = jsonByKey.getAsJsonArray();
                 ts = from(jsonArray.toString(), new TypeToken<ArrayList<T>>() {});
             } catch (Exception e) {
-                log.error("从json串中获取数组失败, Json内容: {}, Key: {}", json, key, e);
+                log.error("gson get list error, json: {}, key: {}", json, key, e);
             }
         }
         return ts;
@@ -311,7 +312,7 @@ public class GsonUtil {
         try {
             element = jsonParser.parse(json);
         } catch (JsonSyntaxException e) {
-            log.error("从json串中获取字段失败, Json内容: {}, Key: {}", json, key, e);
+            log.error("gson get key from json error, json: {}, key: {}", json, key, e);
             return null;
         }
         JsonObject jsonObj = element.getAsJsonObject();
@@ -386,7 +387,7 @@ public class GsonUtil {
         try {
             return new JsonParser().parse(json).isJsonObject();
         } catch (Exception e) {
-            log.error("判断字符串是否是json失败, Json内容: {}", json, e);
+            log.error("gson check json error, json: {}", json, e);
             return false;
         }
     }
