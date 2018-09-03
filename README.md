@@ -12,9 +12,9 @@ Json工具类, 包含Gson、FastJson、Jackson三个库的工具类
 
 ## Gson使用示例：
 ```java
-import com.dxy.library.json.FastjsonUtil;
-import com.dxy.library.json.GsonUtil;
-import com.dxy.library.json.JacksonUtil;
+import com.dxy.library.json.fastjson.FastjsonUtil;
+import com.dxy.library.json.gson.GsonUtil;
+import com.dxy.library.json.jackson.JacksonUtil;
  public class test{
      //JSON解析
       Test test = GsonUtil.from(string, Test.class);
@@ -35,9 +35,9 @@ import com.dxy.library.json.JacksonUtil;
 
 ## Fastjson使用示例：
 ```java
- import com.dxy.library.json.FastjsonUtil;
- import com.dxy.library.json.GsonUtil;
- import com.dxy.library.json.JacksonUtil;
+import com.dxy.library.json.fastjson.FastjsonUtil;
+import com.dxy.library.json.gson.GsonUtil;
+import com.dxy.library.json.jackson.JacksonUtil;
  public class test{
      //JSON解析
       Test test = FastjsonUtil.from(string, Test.class);
@@ -55,9 +55,9 @@ import com.dxy.library.json.JacksonUtil;
 
 ## Jackson使用示例：
 ```java
-import com.dxy.library.json.FastjsonUtil;
-import com.dxy.library.json.GsonUtil;
-import com.dxy.library.json.JacksonUtil;
+import com.dxy.library.json.fastjson.FastjsonUtil;
+import com.dxy.library.json.gson.GsonUtil;
+import com.dxy.library.json.jackson.JacksonUtil;
 public class test{
     
  //JSON解析
