@@ -70,6 +70,9 @@ public class JsonTest {
         Person yamlPerson = JacksonUtil.fromYamlRecource("test.yml", Person.class);
         System.out.println("yamlPerson: " + JacksonUtil.to(yamlPerson));
 
+        HashMap<String, Object> yamlMapPerson = JacksonUtil.fromYamlRecource("test.yml", new TypeReference<HashMap<String, Object>>() {});
+        System.out.println("yamlPerson: " + JacksonUtil.to(yamlMapPerson));
+
         Person propPerson = JacksonUtil.fromPropRecource("test.properties", Person.class);
         System.out.println("propPerson: " + JacksonUtil.to(propPerson));
 
@@ -78,6 +81,57 @@ public class JsonTest {
 
         Person xmlPerson = JacksonUtil.fromXmlRecource("test.xml", Person.class);
         System.out.println("xmlPerson: " + JacksonUtil.to(xmlPerson));
+    }
+
+    @Test
+    public void testXml() {
+        String s = "<?xml version=\"1.0\" encoding=\"utf-8\" ?>" +
+                "<return>\n" +
+                "    <status>Success</status>\n" +
+                "    <amount>2.22</amount>\n" +
+                "    <success>true</success>\n" +
+                "    <count>2</count>\n" +
+
+                "    <content>\n" +
+                "    <name>ase</name>\n" +
+                "    <age>10</age>\n" +
+                "    </content>\n" +
+
+                "    <list>\n" +
+                "    <name>123</name>\n" +
+                "    <name>231</name>\n" +
+                "    </list>\n" +
+
+                "    <contentList>\n" +
+                "    <content>\n" +
+                "    <name>ase</name>\n" +
+                "    <age>123</age>\n" +
+                "    </content>\n" +
+                "    </contentList>\n" +
+
+                "    <map>\n" +
+                "    <key1>value1</key1>\n" +
+                "    <key2>value2</key2>\n" +
+                "    </map>\n" +
+
+                "    <contentMap>\n" +
+                "    <key1>" +
+                "    <content>\n" +
+                "    <name>ase</name>\n" +
+                "    <age>20</age>\n" +
+                "    </content>\n" +
+                "    </key1>\n" +
+                "    <key2>" +
+                "    <content>\n" +
+                "    <name>ase</name>\n" +
+                "    <age>30</age>\n" +
+                "    </content>\n" +
+                "    </key2>\n" +
+                "    </contentMap>\n" +
+
+                "    </return>";
+        TestPojo from = JacksonUtil.fromXml(s, TestPojo.class);
+        System.out.println(JacksonUtil.to(from));
     }
 
     /**

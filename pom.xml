@@ -12,7 +12,7 @@
 
     <groupId>com.github.duanxinyuan</groupId>
     <artifactId>library-json</artifactId>
-    <version>1.4.0</version>
+    <version>1.4.1</version>
     <packaging>jar</packaging>
 
     <distributionManagement>

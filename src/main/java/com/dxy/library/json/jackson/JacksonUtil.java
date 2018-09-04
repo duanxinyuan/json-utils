@@ -26,6 +26,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -174,7 +175,10 @@ public class JacksonUtil {
      * @param name 文件名
      */
     public static <V> V fromYamlRecource(String name, Class<V> c) {
-        try (InputStreamReader reader = new InputStreamReader(c.getResourceAsStream(name), StandardCharsets.UTF_8)) {
+        try (InputStream inputStream = getResourceStream(name); InputStreamReader reader = getResourceReader(inputStream)) {
+            if (reader == null) {
+                return null;
+            }
             return yamlMapper.readValue(reader, c);
         } catch (IOException e) {
             log.error("jackson from yaml recource error, name: {}, class: {}", name, c, e);
@@ -187,7 +191,10 @@ public class JacksonUtil {
      * @param name 文件名
      */
     public static <V> V fromYamlRecource(String name, TypeReference<V> type) {
-        try (InputStreamReader reader = new InputStreamReader(type.getClass().getResourceAsStream(name), StandardCharsets.UTF_8)) {
+        try (InputStream inputStream = getResourceStream(name); InputStreamReader reader = getResourceReader(inputStream)) {
+            if (reader == null) {
+                return null;
+            }
             return yamlMapper.readValue(reader, type);
         } catch (IOException e) {
             log.error("jackson from yaml recource error, name: {}, type: {}", name, type, e);
@@ -226,7 +233,10 @@ public class JacksonUtil {
      * @param name 文件名
      */
     public static <V> V fromPropRecource(String name, Class<V> c) {
-        try (InputStreamReader reader = new InputStreamReader(c.getResourceAsStream(name), StandardCharsets.UTF_8)) {
+        try (InputStream inputStream = getResourceStream(name); InputStreamReader reader = getResourceReader(inputStream)) {
+            if (reader == null) {
+                return null;
+            }
             return javaPropsMapper.readValue(reader, c);
         } catch (IOException e) {
             log.error("jackson from properties recource error, name: {}, class: {}", name, c, e);
@@ -239,7 +249,10 @@ public class JacksonUtil {
      * @param name 文件名
      */
     public static <V> V fromPropRecource(String name, TypeReference<V> type) {
-        try (InputStreamReader reader = new InputStreamReader(type.getClass().getResourceAsStream(name), StandardCharsets.UTF_8)) {
+        try (InputStream inputStream = getResourceStream(name); InputStreamReader reader = getResourceReader(inputStream)) {
+            if (reader == null) {
+                return null;
+            }
             return javaPropsMapper.readValue(reader, type);
         } catch (IOException e) {
             log.error("jackson from properties recource error, name: {}, type: {}", name, type, e);
@@ -253,7 +266,10 @@ public class JacksonUtil {
      * @param separator cloumn的分隔符
      */
     public static <V> List<V> fromCsvRecource(String name, String separator, Class<V> c) {
-        try (InputStreamReader reader = new InputStreamReader(c.getResourceAsStream(name), StandardCharsets.UTF_8)) {
+        try (InputStream inputStream = getResourceStream(name); InputStreamReader reader = getResourceReader(inputStream)) {
+            if (reader == null) {
+                return null;
+            }
             CsvSchema schema = CsvSchema.builder().setColumnSeparator(separator.charAt(0)).setUseHeader(true).build();
             return (List<V>) csvMapper.reader(schema).forType(c).readValues(reader).readAll();
         } catch (IOException e) {
@@ -282,7 +298,10 @@ public class JacksonUtil {
      * @param name 文件名
      */
     public static <V> V fromXmlRecource(String name, Class<V> c) {
-        try (InputStreamReader reader = new InputStreamReader(c.getResourceAsStream(name), StandardCharsets.UTF_8)) {
+        try (InputStream inputStream = getResourceStream(name); InputStreamReader reader = getResourceReader(inputStream)) {
+            if (reader == null) {
+                return null;
+            }
             return xmlMapper.readValue(reader, c);
         } catch (IOException e) {
             log.error("jackson from xml recource error, name: {}, class: {}", name, c, e);
@@ -295,7 +314,10 @@ public class JacksonUtil {
      * @param name 文件名
      */
     public static <V> V fromXmlRecource(String name, TypeReference<V> type) {
-        try (InputStreamReader reader = new InputStreamReader(type.getClass().getResourceAsStream(name), StandardCharsets.UTF_8)) {
+        try (InputStream inputStream = getResourceStream(name); InputStreamReader reader = getResourceReader(inputStream)) {
+            if (reader == null) {
+                return null;
+            }
             return xmlMapper.readValue(reader, type);
         } catch (IOException e) {
             log.error("jackson from xml recource error, name: {}, type: {}", name, type, e);
@@ -657,5 +679,16 @@ public class JacksonUtil {
             log.error("jackson check json error, json: {}", json, e);
             return false;
         }
+    }
+
+    private static InputStream getResourceStream(String name) {
+        return JacksonUtil.class.getClassLoader().getResourceAsStream(name);
+    }
+
+    private static InputStreamReader getResourceReader(InputStream inputStream) {
+        if (null == inputStream) {
+            return null;
+        }
+        return new InputStreamReader(inputStream, StandardCharsets.UTF_8);
     }
 }
