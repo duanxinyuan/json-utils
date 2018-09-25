@@ -1,8 +1,3 @@
-/**
- * android-studio-snooker
- * http://blog.csdn.net/qq_20698023
- * Dye-段新原
- */
 package com.dxy.library.json.gson;
 
 import com.dxy.library.json.gson.adapter.NumberTypeAdapter;

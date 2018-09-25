@@ -3,11 +3,25 @@ Json工具类, 包含Gson、FastJson、Jackson三个库的工具类
 
 ## Maven依赖：
 ```xml
+<dependencies>
 <dependency>
     <groupId>com.github.duanxinyuan</groupId>
-    <artifactId>library-json</artifactId>
-    <version>1.4.0</version>
+    <artifactId>library-json-gson</artifactId>
+    <version>1.0.0</version>
 </dependency>
+
+<dependency>
+    <groupId>com.github.duanxinyuan</groupId>
+    <artifactId>library-json-jackson</artifactId>
+    <version>1.0.0</version>
+</dependency>
+
+<dependency>
+    <groupId>com.github.duanxinyuan</groupId>
+    <artifactId>library-json-fastjson</artifactId>
+    <version>1.0.0</version>
+</dependency>
+</dependencies>
 ```
 
 ## Gson使用示例：
