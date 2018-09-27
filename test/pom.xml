@@ -5,30 +5,30 @@
     <parent>
         <artifactId>library-json</artifactId>
         <groupId>com.github.duanxinyuan</groupId>
-        <version>1.5.0</version>
+        <version>1.6.0</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>test</artifactId>
-    <version>1.0.0</version>
+    <version>1.1.0</version>
 
     <dependencies>
         <dependency>
             <groupId>com.github.duanxinyuan</groupId>
             <artifactId>library-json-gson</artifactId>
-            <version>1.0.0</version>
+            <version>1.1.0</version>
             <scope>test</scope>
         </dependency>
      <dependency>
             <groupId>com.github.duanxinyuan</groupId>
             <artifactId>library-json-jackson</artifactId>
-            <version>1.0.0</version>
+            <version>1.1.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>com.github.duanxinyuan</groupId>
             <artifactId>library-json-fastjson</artifactId>
-            <version>1.0.0</version>
+            <version>1.1.0</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

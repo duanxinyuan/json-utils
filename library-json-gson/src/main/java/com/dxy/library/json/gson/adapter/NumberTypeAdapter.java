@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 
 /**
- * Gson解析的Number类型的字段解析适配器
+ * Gson反序列化的Number类型的字段反序列化适配器
  * @author duanxinyuan
  * 2018/6/20 14:58
  */

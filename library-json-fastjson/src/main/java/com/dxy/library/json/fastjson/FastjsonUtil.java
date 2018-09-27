@@ -10,7 +10,6 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -23,35 +22,35 @@ import java.util.List;
 public class FastjsonUtil {
 
     /**
-     * JSON解析
+     * JSON反序列化
      */
     public static <V> V from(Object jsonObj, Class<V> c) {
         return JSON.parseObject(jsonObj.toString(), c);
     }
 
     /**
-     * JSON解析
+     * JSON反序列化
      */
     public static <V> V from(String json, Class<V> c) {
         return JSON.parseObject(json, c);
     }
 
     /**
-     * JSON解析
+     * JSON反序列化
      */
     public static <V> V from(String json, TypeReference<V> typeReference) {
         return JSON.parseObject(json, typeReference.getType());
     }
 
     /**
-     * 转化为JSON
+     * 序列化为JSON
      */
-    public static <V> String to(ArrayList<V> list) {
+    public static <V> String to(List<V> list) {
         return JSON.toJSONString(list);
     }
 
     /**
-     * 转化为JSON
+     * 序列化为JSON
      */
     public static <V> String to(V v) {
         return JSON.toJSONString(v);

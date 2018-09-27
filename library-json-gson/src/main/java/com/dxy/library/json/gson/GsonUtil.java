@@ -4,18 +4,21 @@ import com.dxy.library.json.gson.adapter.NumberTypeAdapter;
 import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
+import com.google.gson.stream.JsonWriter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
-import java.io.StringReader;
+import java.io.*;
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Gson工具类
- * 优势：数据量小（低于万）的时候速度有绝对优势
+ * 优势：数据量小（低于1万）的时候速度有绝对优势，
+ * 注解支持较为完善，支持的数据源较广泛（字符串，对象，文件、流）
  * @author duanxinyuan
  * 2015/5/27 16:53
  */
@@ -45,81 +48,170 @@ public class GsonUtil {
     }
 
     /**
-     * JSON解析
+     * JSON反序列化
+     */
+    public static <V> V from(InputStream inputStream, Class<V> c) {
+        JsonReader reader = new JsonReader(new InputStreamReader(inputStream));
+        return gson.fromJson(reader, c);
+    }
+
+    /**
+     * JSON反序列化
+     */
+    public static <V> V from(File file, Class<V> c) {
+        try {
+            JsonReader reader = new JsonReader(new FileReader(file));
+            return gson.fromJson(reader, c);
+        } catch (FileNotFoundException e) {
+            log.error("gson from error, file path: {}, type: {}", file.getPath(), c, e);
+            return null;
+        }
+    }
+
+    /**
+     * JSON反序列化
+     */
+    public static <V> V from(InputStream inputStream, TypeToken<V> typeToken) {
+        JsonReader reader = new JsonReader(new InputStreamReader(inputStream));
+        return gson.fromJson(reader, typeToken.getType());
+    }
+
+    /**
+     * JSON反序列化
+     */
+    public static <V> V from(File file, TypeToken<V> typeToken) {
+        try {
+            JsonReader reader = new JsonReader(new FileReader(file));
+            return gson.fromJson(reader, typeToken.getType());
+        } catch (FileNotFoundException e) {
+            log.error("gson from error, file path: {}, type: {}", file.getPath(), typeToken.getType(), e);
+            return null;
+        }
+    }
+
+    /**
+     * JSON反序列化
      */
     public static <V> V from(Object jsonObj, Class<V> c) {
         return gson.fromJson(jsonObj.toString(), c);
     }
 
     /**
-     * JSON解析
+     * JSON反序列化
      */
     public static <V> V from(String json, Class<V> c) {
         return gson.fromJson(json, c);
     }
 
     /**
-     * JSON解析
+     * JSON反序列化
      */
     public static <V> V from(String json, Type type) {
         return gson.fromJson(json, type);
     }
 
     /**
-     * JSON解析
+     * JSON反序列化
      */
     public static <V> V from(String json, TypeToken<V> typeToken) {
         return gson.fromJson(json, typeToken.getType());
     }
 
     /**
-     * 宽松JSON解析
+     * 宽松JSON反序列化
      */
-    public static <V> V lenientFrom(Object jsonObj, Class<V> c) {
+    public static <V> V fromLenient(InputStream inputStream, Class<V> c) {
+        JsonReader reader = new JsonReader(new InputStreamReader(inputStream));
+        reader.setLenient(true);
+        return gson.fromJson(reader, c);
+    }
+
+    /**
+     * 宽松JSON反序列化
+     */
+    public static <V> V fromLenient(File file, Class<V> c) {
+        try {
+            JsonReader reader = new JsonReader(new FileReader(file));
+            reader.setLenient(true);
+            return gson.fromJson(reader, c);
+        } catch (FileNotFoundException e) {
+            log.error("gson lenient from error, file path: {}, type: {}", file.getPath(), c, e);
+            return null;
+        }
+    }
+
+    /**
+     * 宽松JSON反序列化
+     */
+    public static <V> V fromLenient(Object jsonObj, Class<V> c) {
         JsonReader reader = new JsonReader(new StringReader(jsonObj.toString()));
         reader.setLenient(true);
         return gson.fromJson(reader, c);
     }
 
     /**
-     * 宽松JSON解析
+     * 宽松JSON反序列化
      */
-    public static <V> V lenientFrom(String json, Class<V> c) {
+    public static <V> V fromLenient(String json, Class<V> c) {
         JsonReader reader = new JsonReader(new StringReader(json));
         reader.setLenient(true);
         return gson.fromJson(reader, c);
     }
 
     /**
-     * 宽松JSON解析
+     * 宽松JSON反序列化
      */
-    public static <V> V lenientFrom(String json, Type type) {
+    public static <V> V fromLenient(String json, Type type) {
         JsonReader reader = new JsonReader(new StringReader(json));
         reader.setLenient(true);
         return gson.fromJson(reader, type);
     }
 
     /**
-     * 宽松JSON解析
+     * 宽松JSON反序列化
      */
-    public static <V> V lenientFrom(String json, TypeToken<V> typeToken) {
+    public static <V> V fromLenient(String json, TypeToken<V> typeToken) {
         JsonReader reader = new JsonReader(new StringReader(json));
         reader.setLenient(true);
         return gson.fromJson(reader, typeToken.getType());
     }
 
     /**
-     * 转化为JSON
+     * 序列化为JSON
      */
-    public static <V> String to(ArrayList<V> list) {
+    public static <V> String to(List<V> list) {
         return gson.toJson(list);
     }
 
     /**
-     * 转化为JSON
+     * 序列化为JSON
      */
     public static <V> String to(V v) {
         return gson.toJson(v);
+    }
+
+    /**
+     * 序列化为JSON文件
+     */
+    public static <V> void toFile(String path, List<V> list) {
+        try (JsonWriter jsonWriter = new JsonWriter(new FileWriter(new File(path), true));) {
+            gson.toJson(list, new TypeToken<List<V>>() {}.getType(), jsonWriter);
+            jsonWriter.flush();
+        } catch (Exception e) {
+            log.error("gson to file error, path: {}, list: {}", path, list, e);
+        }
+    }
+
+    /**
+     * 序列化为JSON文件
+     */
+    public static <V> void toFile(String path, V v) {
+        try (JsonWriter jsonWriter = new JsonWriter(new FileWriter(new File(path), true));) {
+            gson.toJson(v, v.getClass(), jsonWriter);
+            jsonWriter.flush();
+        } catch (Exception e) {
+            log.error("gson to file error, path: {}, obj: {}", path, v, e);
+        }
     }
 
     /**

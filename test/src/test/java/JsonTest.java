@@ -32,8 +32,10 @@ public class JsonTest {
         System.out.println(GsonUtil.format(gsonStr));
         Person from = GsonUtil.from(gsonStr, Person.class);
         System.out.println(from);
-        Person lenientFrom = GsonUtil.lenientFrom(gsonStr, Person.class);
-        System.out.println(lenientFrom);
+        Person fromLenient = GsonUtil.fromLenient(gsonStr, Person.class);
+        System.out.println(fromLenient);
+        GsonUtil.toFile("/data/test_to_gson.json", from);
+        GsonUtil.toFile("/data/test_to_gson.json", Lists.newArrayList(from));
     }
 
     @Test
@@ -67,20 +69,36 @@ public class JsonTest {
         Person from = JacksonUtil.from(jacksonStr, Person.class);
         System.out.println(JacksonUtil.to(from));
 
+        System.out.println(JacksonUtil.to(from));
+        JacksonUtil.toFile("/data/test_to.json", from);
+        JacksonUtil.toFile("/data/test_to.json", Lists.newArrayList(from));
+
         Person yamlPerson = JacksonUtil.fromYamlRecource("test.yml", Person.class);
         System.out.println("yamlPerson: " + JacksonUtil.to(yamlPerson));
+        System.out.println("yamlPerson: " + JacksonUtil.toYaml(yamlPerson));
+        JacksonUtil.toPropFile("/data/test_to.yml", yamlPerson);
 
         HashMap<String, Object> yamlMapPerson = JacksonUtil.fromYamlRecource("test.yml", new TypeReference<HashMap<String, Object>>() {});
         System.out.println("yamlPerson: " + JacksonUtil.to(yamlMapPerson));
+        System.out.println("yamlPerson: " + JacksonUtil.toYaml(yamlMapPerson));
+        JacksonUtil.toPropFile("/data/test_to.yml", yamlMapPerson);
 
         Person propPerson = JacksonUtil.fromPropRecource("test.properties", Person.class);
         System.out.println("propPerson: " + JacksonUtil.to(propPerson));
+        System.out.println("propPerson: " + JacksonUtil.toProp(propPerson));
+        JacksonUtil.toPropFile("/data/test_to.properties", propPerson);
 
-        List<Person> csvPerson = JacksonUtil.fromCsvRecource("test.csv", "\t", Person.class);
-        System.out.println("csvPerson: " + JacksonUtil.to(csvPerson));
+        List<Person> csvPersons = JacksonUtil.fromCsvRecource("test.csv", "\t", Person.class);
+        System.out.println("csvPerson: " + JacksonUtil.to(csvPersons));
+        System.out.println("csvPerson: " + JacksonUtil.toCsv(csvPersons));
+        System.out.println("csvPerson: " + JacksonUtil.toCsv(csvPersons.get(0)));
+        JacksonUtil.toCsvFile("/data/test_to.csv", csvPersons);
+        JacksonUtil.toCsvFile("/data/test_to.csv", csvPersons.get(0));
 
         Person xmlPerson = JacksonUtil.fromXmlRecource("test.xml", Person.class);
         System.out.println("xmlPerson: " + JacksonUtil.to(xmlPerson));
+        System.out.println("xmlPerson: " + JacksonUtil.toXml(xmlPerson));
+        JacksonUtil.toXmlFile("/data/test_to.xml", xmlPerson);
     }
 
     @Test
