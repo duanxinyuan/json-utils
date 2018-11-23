@@ -163,6 +163,8 @@ public class JacksonUtil {
         objectMapper.setDateFormat(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"));
         //识别单引号
         objectMapper.enable(JsonParser.Feature.ALLOW_SINGLE_QUOTES);
+        //识别特殊字符
+        objectMapper.enable(JsonParser.Feature.ALLOW_UNQUOTED_CONTROL_CHARS);
         //识别Java8时间
         objectMapper.registerModule(new ParameterNamesModule());
         objectMapper.registerModule(new Jdk8Module());
