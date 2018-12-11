@@ -3,20 +3,21 @@ package com.dxy.library.json.gson.adapter;
 import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 
 import java.io.IOException;
 import java.math.BigDecimal;
 
 /**
- * Gson反序列化的Number类型的字段反序列化适配器
+ * Gson解析的Number类型的字段解析适配器
  * @author duanxinyuan
  * 2018/6/20 14:58
  */
-public class NumberTypeAdapter extends TypeAdapter<Number> {
-    private Class c;
+public class NumberTypeAdapter<T> extends TypeAdapter<Number> {
+    private Class<T> c;
 
-    public NumberTypeAdapter(Class c) {
+    public NumberTypeAdapter(Class<T> c) {
         this.c = c;
     }
 
@@ -30,26 +31,44 @@ public class NumberTypeAdapter extends TypeAdapter<Number> {
         try {
             String json = jsonReader.nextString();
             if (c == short.class) {
-                return NumberUtils.toShort(json);
+                return (short) NumberUtils.toDouble(json);
             } else if (c == Short.class) {
-                return Short.parseShort(json);
+                if (StringUtils.isEmpty(json)) {
+                    return null;
+                }
+                return (short) NumberUtils.toDouble(json);
             } else if (c == int.class) {
-                return NumberUtils.toInt(json);
+                return (int) NumberUtils.toDouble(json);
             } else if (c == Integer.class) {
-                return Integer.parseInt(json);
+                if (StringUtils.isEmpty(json)) {
+                    return null;
+                }
+                return (int) NumberUtils.toDouble(json);
             } else if (c == long.class) {
-                return NumberUtils.toLong(json);
+                return (long) NumberUtils.toDouble(json);
             } else if (c == Long.class) {
-                return Long.parseLong(json);
+                if (StringUtils.isEmpty(json)) {
+                    return null;
+                }
+                return (long) NumberUtils.toDouble(json);
             } else if (c == float.class) {
                 return NumberUtils.toFloat(json);
             } else if (c == Float.class) {
-                return Float.parseFloat(json);
+                if (StringUtils.isEmpty(json)) {
+                    return null;
+                }
+                return NumberUtils.toFloat(json);
             } else if (c == double.class) {
                 return NumberUtils.toDouble(json);
             } else if (c == Double.class) {
-                return Double.parseDouble(json);
+                if (StringUtils.isEmpty(json)) {
+                    return null;
+                }
+                return NumberUtils.toDouble(json);
             } else if (c == BigDecimal.class) {
+                if (StringUtils.isEmpty(json)) {
+                    return null;
+                }
                 return new BigDecimal(json);
             } else {
                 return Integer.parseInt(json);

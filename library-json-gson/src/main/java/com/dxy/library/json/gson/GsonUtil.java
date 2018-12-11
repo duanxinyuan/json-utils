@@ -1,10 +1,10 @@
 package com.dxy.library.json.gson;
 
-import com.dxy.library.json.gson.adapter.NumberTypeAdapter;
 import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
+import com.dxy.library.json.gson.adapter.NumberTypeAdapter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
@@ -18,7 +18,7 @@ import java.util.List;
 /**
  * Gson工具类
  * 优势：数据量小（低于1万）的时候速度有绝对优势，
- * 注解支持较为完善，支持的数据源较广泛（字符串，对象，文件、流）,支持宽松的JSON解析
+ * 注解支持较为完善，支持的数据源较广泛（字符串，对象，文件、流）
  * @author duanxinyuan
  * 2015/5/27 16:53
  */
@@ -34,17 +34,17 @@ public class GsonUtil {
     }
 
     private static void registTypeAdapter(GsonBuilder gsonBuilder) {
-        gsonBuilder.registerTypeAdapter(short.class, new NumberTypeAdapter(short.class));
-        gsonBuilder.registerTypeAdapter(Short.class, new NumberTypeAdapter(Short.class));
-        gsonBuilder.registerTypeAdapter(int.class, new NumberTypeAdapter(int.class));
-        gsonBuilder.registerTypeAdapter(Integer.class, new NumberTypeAdapter(Integer.class));
-        gsonBuilder.registerTypeAdapter(long.class, new NumberTypeAdapter(long.class));
-        gsonBuilder.registerTypeAdapter(Long.class, new NumberTypeAdapter(Long.class));
-        gsonBuilder.registerTypeAdapter(float.class, new NumberTypeAdapter(float.class));
-        gsonBuilder.registerTypeAdapter(Float.class, new NumberTypeAdapter(Float.class));
-        gsonBuilder.registerTypeAdapter(double.class, new NumberTypeAdapter(double.class));
-        gsonBuilder.registerTypeAdapter(Double.class, new NumberTypeAdapter(Double.class));
-        gsonBuilder.registerTypeAdapter(BigDecimal.class, new NumberTypeAdapter(BigDecimal.class));
+        gsonBuilder.registerTypeAdapter(short.class, new NumberTypeAdapter<>(short.class));
+        gsonBuilder.registerTypeAdapter(Short.class, new NumberTypeAdapter<>(Short.class));
+        gsonBuilder.registerTypeAdapter(int.class, new NumberTypeAdapter<>(int.class));
+        gsonBuilder.registerTypeAdapter(Integer.class, new NumberTypeAdapter<>(Integer.class));
+        gsonBuilder.registerTypeAdapter(long.class, new NumberTypeAdapter<>(long.class));
+        gsonBuilder.registerTypeAdapter(Long.class, new NumberTypeAdapter<>(Long.class));
+        gsonBuilder.registerTypeAdapter(float.class, new NumberTypeAdapter<>(float.class));
+        gsonBuilder.registerTypeAdapter(Float.class, new NumberTypeAdapter<>(Float.class));
+        gsonBuilder.registerTypeAdapter(double.class, new NumberTypeAdapter<>(double.class));
+        gsonBuilder.registerTypeAdapter(Double.class, new NumberTypeAdapter<>(Double.class));
+        gsonBuilder.registerTypeAdapter(BigDecimal.class, new NumberTypeAdapter<>(BigDecimal.class));
     }
 
     /**
