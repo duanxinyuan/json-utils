@@ -7,7 +7,7 @@ Json工具类, 包含Gson、FastJson、Jackson三个库的工具类
 <dependency>
     <groupId>com.github.duanxinyuan</groupId>
     <artifactId>library-json-gson</artifactId>
-    <version>1.1.0</version>
+    <version>1.1.1</version>
 </dependency>
 
 <dependency>
