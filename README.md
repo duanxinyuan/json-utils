@@ -1,4 +1,4 @@
-# Json-Utils
+# json-utils
 Json工具类, 包含Gson、FastJson、Jackson三个库的工具类，其中Jackson支持Scala版本
 
 ## Maven依赖：
