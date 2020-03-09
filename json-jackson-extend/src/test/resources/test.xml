@@ -1,0 +1,16 @@
+<Person>
+    <name>张三</name>
+    <date>2019-04-19 12:29:20</date>
+    <localDateTime>2019-04-19T12:29:20.487</localDateTime>
+    <age>100</age>
+    <money>500.21</money>
+    <man>true</man>
+    <trait>
+        <trait>淡然</trait>
+        <trait>温和</trait>
+    </trait>
+    <cards>
+        <建行卡>649874545</建行卡>
+        <身份证>4a6d456as</身份证>
+    </cards>
+</Person>

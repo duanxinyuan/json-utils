@@ -1,25 +1,37 @@
 # Json-Utils
-Json工具类, 包含Gson、FastJson、Jackson三个库的工具类
+Json工具类, 包含Gson、FastJson、Jackson三个库的工具类，其中Jackson支持Scala版本
 
 ## Maven依赖：
 ```xml
 <dependencies>
 <dependency>
     <groupId>com.github.duanxinyuan</groupId>
-    <artifactId>library-json-gson</artifactId>
-    <version>1.1.1</version>
+    <artifactId>json-fastjson</artifactId>
+      <version>1.7.0</version>
 </dependency>
 
 <dependency>
     <groupId>com.github.duanxinyuan</groupId>
-    <artifactId>library-json-jackson</artifactId>
-    <version>1.1.0</version>
+    <artifactId>json-gson</artifactId>
+     <version>1.7.0</version>
 </dependency>
 
 <dependency>
     <groupId>com.github.duanxinyuan</groupId>
-    <artifactId>library-json-fastjson</artifactId>
-    <version>1.1.0</version>
+    <artifactId>json-jackson</artifactId>
+    <version>1.7.0</version>
+</dependency>
+
+<dependency>
+    <groupId>com.github.duanxinyuan</groupId>
+    <artifactId>json-jackson-extend</artifactId>
+    <version>1.7.0</version>
+</dependency>
+
+<dependency>
+    <groupId>com.github.duanxinyuan</groupId>
+    <artifactId>json-jackson-scala</artifactId>
+    <version>1.7.0</version>
 </dependency>
 </dependencies>
 ```
@@ -78,6 +90,10 @@ Json工具类, 包含Gson、FastJson、Jackson三个库的工具类
     //获取JSON中的单个字符串
     String name = JacksonUtil.getString(string,"name");
     
+```
+
+## Jackson-Extend使用示例：
+```text
     //反序列化Yaml
     Test test = JacksonUtil.fromYamlRecource(string, Test.class);
     Test test = JacksonUtil.fromYamlFile(string, Test.class);
