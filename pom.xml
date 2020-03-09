@@ -43,14 +43,14 @@
         </license>
     </licenses>
 
-    <name>Json-Utils</name>
-    <url>https://github.com/duanxinyuan/Json-Utils</url>
+    <name>json-utils</name>
+    <url>https://github.com/duanxinyuan/json-utils</url>
     <description>Json工具类, 包含Gson、FastJson、Jackson三个库的工具类，其中Jackson支持Scala版本</description>
 
     <scm>
-        <connection>scm:git:https://github.com/duanxinyuan/Json-Utils.git</connection>
-        <developerConnection>scm:git:https://github.com/duanxinyuan/Json-Utils.git</developerConnection>
-        <url>https://github.com/duanxinyuan/Json-Utils</url>
+        <connection>scm:git:https://github.com/duanxinyuan/json-utils.git</connection>
+        <developerConnection>scm:git:https://github.com/duanxinyuan/json-utils.git</developerConnection>
+        <url>https://github.com/duanxinyuan/json-utils</url>
     </scm>
 
     <developers>
