@@ -7,31 +7,31 @@ Json工具类, 包含Gson、FastJson、Jackson三个库的工具类，其中Jack
 <dependency>
     <groupId>com.github.duanxinyuan</groupId>
     <artifactId>json-fastjson</artifactId>
-    <version>1.7.0</version>
+    <version>1.8.0</version>
 </dependency>
 
 <dependency>
     <groupId>com.github.duanxinyuan</groupId>
     <artifactId>json-gson</artifactId>
-     <version>1.7.0</version>
+     <version>1.8.0</version>
 </dependency>
 
 <dependency>
     <groupId>com.github.duanxinyuan</groupId>
     <artifactId>json-jackson</artifactId>
-    <version>1.7.0</version>
+    <version>1.8.0</version>
 </dependency>
 
 <dependency>
     <groupId>com.github.duanxinyuan</groupId>
     <artifactId>json-jackson-extend</artifactId>
-    <version>1.7.0</version>
+    <version>1.8.0</version>
 </dependency>
 
 <dependency>
     <groupId>com.github.duanxinyuan</groupId>
     <artifactId>json-jackson-scala</artifactId>
-    <version>1.7.0</version>
+    <version>1.8.0</version>
 </dependency>
 </dependencies>
 ```
@@ -54,7 +54,7 @@ Json工具类, 包含Gson、FastJson、Jackson三个库的工具类，其中Jack
       String testStr = GsonUtil.format(test);
     
       //获取JSON中的单个字符串
-      String name = GsonUtil.getString(string,"name");
+      String name = GsonUtil.getAsString(string,"name");
 ```
 
 ## Fastjson使用示例：
@@ -69,7 +69,7 @@ Json工具类, 包含Gson、FastJson、Jackson三个库的工具类，其中Jack
       String testStr = FastjsonUtil.to(test);
     
       //获取JSON中的单个字符串
-      String name = FastjsonUtil.getString(string,"name");
+      String name = FastjsonUtil.getAsString(string,"name");
 ```
 
 ## Jackson使用示例：
@@ -88,50 +88,50 @@ Json工具类, 包含Gson、FastJson、Jackson三个库的工具类，其中Jack
     String testStr = JacksonUtil.toFile(path, test);
     
     //获取JSON中的单个字符串
-    String name = JacksonUtil.getString(string,"name");
+    String name = JacksonUtil.getAsString(string,"name");
     
 ```
 
 ## Jackson-Extend使用示例：
 ```text
     //反序列化Yaml
-    Test test = JacksonUtil.fromYamlRecource(string, Test.class);
-    Test test = JacksonUtil.fromYamlFile(string, Test.class);
+    Test test = JacksonExtendUtil.fromYamlResource(string, Test.class);
+    Test test = JacksonExtendUtil.fromYamlFile(string, Test.class);
     
     //序列化为Yaml
-    JacksonUtil.toYaml(test);
+    JacksonExtendUtil.toYaml(test);
   
     //序列化为Yaml文件
-    JacksonUtil.toYamlFile(path, test);
+    JacksonExtendUtil.toYamlFile(path, test);
     
     //反序列化Properties
-    Test test = JacksonUtil.fromPropRecource(string, Test.class);
+    Test test = JacksonExtendUtil.fromPropResource(string, Test.class);
         
     //序列化为Properties
-    JacksonUtil.toProp(test);
+    JacksonExtendUtil.toProp(test);
   
     //序列化为Properties文件
-    JacksonUtil.toPropFile(path, test);
+    JacksonExtendUtil.toPropFile(path, test);
 
     //反序列化Csv
-    Test test = JacksonUtil.fromCsvRecource(string, Test.class);
-    Test test = JacksonUtil.fromCsvFile(string, Test.class);
+    Test test = JacksonExtendUtil.fromCsvResource(string, Test.class);
+    Test test = JacksonExtendUtil.fromCsvFile(string, Test.class);
           
     //序列化为Csv
-    JacksonUtil.toCsv(test);
+    JacksonExtendUtil.toCsv(test);
   
     //序列化为Csv文件
-    JacksonUtil.toCsvFile(path, test);
-    JacksonUtil.toCsvFile(path, separator, test);
+    JacksonExtendUtil.toCsvFile(path, test);
+    JacksonExtendUtil.toCsvFile(path, separator, test);
 
     //反序列化Xml
-    Test test = JacksonUtil.fromXmlRecource(string, Test.class);
-    Test test = JacksonUtil.fromXmlFile(string, Test.class);
-    Test test = JacksonUtil.fromXml(string, Test.class);
+    Test test = JacksonExtendUtil.fromXmlResource(string, Test.class);
+    Test test = JacksonExtendUtil.fromXmlFile(string, Test.class);
+    Test test = JacksonExtendUtil.fromXml(string, Test.class);
          
     //序列化为Xml
-    JacksonUtil.toXml(test);
+    JacksonExtendUtil.toXml(test);
   
     //序列化为Xml文件
-    JacksonUtil.toXmlFile(path, test);
+    JacksonExtendUtil.toXmlFile(path, test);
 ```
