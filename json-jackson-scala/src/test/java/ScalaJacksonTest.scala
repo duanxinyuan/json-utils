@@ -15,7 +15,7 @@ class ScalaJacksonTest {
 
   @Test
   def testScala(): Unit = {
-    val json = "{\"name\":\"张三\",\"date\":\"2019-10-29 14:16:01\",\"localDateTime\":\"2019-10-29T14:16:02.079\",\"age\":100,\"money\":500.21,\"man\":true,\"trait\":[\"淡然\",\"温和\"],\"cards\":{\"建行卡\":\"649874545\",\"身份证\":\"4a6d456as\"}}"
+    val json = "{\"name\":\"张三\",\"date\":\"2019-10-29 14:16:01\",\"localDateTime\":\"2019-10-29 14:16:02\",\"age\":100,\"money\":500.21,\"man\":true,\"trait\":[\"淡然\",\"温和\"],\"cards\":{\"建行卡\":\"649874545\",\"身份证\":\"4a6d456as\"}}"
     val person = JacksonUtil.from(json, classOf[ScalaPerson])
     println(JacksonUtil.to(person))
   }

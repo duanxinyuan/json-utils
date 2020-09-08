@@ -6,7 +6,6 @@ import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -25,7 +24,6 @@ import java.util.*;
  * @author duanxinyuan
  * 2015/5/27 16:53
  */
-@Slf4j
 public class GsonUtil {
     private static Gson gson;
 
@@ -83,7 +81,6 @@ public class GsonUtil {
             JsonReader reader = new JsonReader(new FileReader(file));
             return gson.fromJson(reader, type);
         } catch (FileNotFoundException e) {
-            log.error("gson from error, file path: {}, type: {}", file.getPath(), type, e);
             throw new GsonException("gson from error, file path: {}, type: {}", file.getPath(), type, e);
         }
     }
@@ -96,7 +93,6 @@ public class GsonUtil {
             JsonReader reader = new JsonReader(new FileReader(file));
             return gson.fromJson(reader, typeToken.getType());
         } catch (FileNotFoundException e) {
-            log.error("gson from error, file path: {}, type: {}", file.getPath(), typeToken.getType(), e);
             throw new GsonException("gson from error, file path: {}, type: {}", file.getPath(), typeToken.getType(), e);
         }
     }
@@ -110,7 +106,6 @@ public class GsonUtil {
             TypeToken<List<V>> typeToken = (TypeToken<List<V>>) TypeToken.getParameterized(ArrayList.class, type);
             return gson.fromJson(reader, typeToken.getType());
         } catch (FileNotFoundException e) {
-            log.error("gson from error, file path: {}, type: {}", file.getPath(), type, e);
             throw new GsonException("gson from error, file path: {}, type: {}", file.getPath(), type, e);
         }
     }
@@ -179,7 +174,6 @@ public class GsonUtil {
             reader.setLenient(true);
             return gson.fromJson(reader, type);
         } catch (FileNotFoundException e) {
-            log.error("gson lenient from error, file path: {}, type: {}", file.getPath(), type, e);
             throw new GsonException("gson lenient from error, file path: {}, type: {}", file.getPath(), type, e);
         }
     }
@@ -194,7 +188,6 @@ public class GsonUtil {
             TypeToken<List<V>> typeToken = (TypeToken<List<V>>) TypeToken.getParameterized(ArrayList.class, type);
             return gson.fromJson(reader, typeToken.getType());
         } catch (FileNotFoundException e) {
-            log.error("gson lenient from error, file path: {}, type: {}", file.getPath(), type, e);
             throw new GsonException("gson lenient from error, file path: {}, type: {}", file.getPath(), type, e);
         }
     }
@@ -270,7 +263,6 @@ public class GsonUtil {
             gson.toJson(list, new TypeToken<List<V>>() {}.getType(), jsonWriter);
             jsonWriter.flush();
         } catch (Exception e) {
-            log.error("gson to file error, path: {}, list: {}", path, list, e);
             throw new GsonException("gson to file error, path: {}, list: {}", path, list, e);
         }
     }
@@ -283,7 +275,6 @@ public class GsonUtil {
             gson.toJson(v, v.getClass(), jsonWriter);
             jsonWriter.flush();
         } catch (Exception e) {
-            log.error("gson to file error, path: {}, obj: {}", path, v, e);
             throw new GsonException("gson to file error, path: {}, obj: {}", path, v, e);
         }
     }
@@ -324,7 +315,6 @@ public class GsonUtil {
         try {
             return jsonByKey.getAsInt();
         } catch (Exception e) {
-            log.error("gson get int error, json: {}, key: {}", json, key, e);
             throw new GsonException("gson get int error, json: {}, key: {}", json, key, e);
         }
     }
@@ -344,7 +334,6 @@ public class GsonUtil {
         try {
             return jsonByKey.getAsLong();
         } catch (Exception e) {
-            log.error("gson get long error, json: {}, key: {}", json, key, e);
             throw new GsonException("gson get long error, json: {}, key: {}", json, key, e);
         }
     }
@@ -364,7 +353,6 @@ public class GsonUtil {
         try {
             return jsonByKey.getAsDouble();
         } catch (Exception e) {
-            log.error("gson get double error, json: {}, key: {}", json, key, e);
             throw new GsonException("gson get double error, json: {}, key: {}", json, key, e);
         }
     }
@@ -384,7 +372,6 @@ public class GsonUtil {
         try {
             return jsonByKey.getAsBigInteger();
         } catch (Exception e) {
-            log.error("gson get big integer error, json: {}, key: {}", json, key, e);
             throw new GsonException("gson get big integer error, json: {}, key: {}", json, key, e);
         }
     }
@@ -404,7 +391,6 @@ public class GsonUtil {
         try {
             return jsonByKey.getAsBigDecimal();
         } catch (Exception e) {
-            log.error("gson get big decimal error, json: {}, key: {}", json, key, e);
             throw new GsonException("gson get big decimal error, json: {}, key: {}", json, key, e);
         }
     }
@@ -437,7 +423,6 @@ public class GsonUtil {
                 }
             }
         } catch (Exception e) {
-            log.error("gson get boolean error, json: {}, key: {}", json, key, e);
             throw new GsonException("gson get boolean error, json: {}, key: {}", json, key, e);
         }
     }
@@ -457,7 +442,6 @@ public class GsonUtil {
         try {
             return jsonByKey.getAsByte();
         } catch (Exception e) {
-            log.error("gson get byte error, json: {}, key: {}", json, key, e);
             throw new GsonException("gson get byte error, json: {}, key: {}", json, key, e);
         }
     }
@@ -477,7 +461,6 @@ public class GsonUtil {
         try {
             return from(jsonByKey.getAsString(), type);
         } catch (Exception e) {
-            log.error("gson get list error, json: {}, key: {}, type: {}", json, key, type, e);
             throw new GsonException("gson get list error, json: {}, key: {}, type: {}", json, key, type, e);
         }
     }
@@ -499,7 +482,6 @@ public class GsonUtil {
             TypeToken<List<V>> typeToken = (TypeToken<List<V>>) TypeToken.getParameterized(ArrayList.class, type);
             return from(jsonArray.toString(), typeToken);
         } catch (Exception e) {
-            log.error("gson get list error, json: {}, key: {}, type: {}", json, key, type, e);
             throw new GsonException("gson get list error, json: {}, key: {}, type: {}", json, key, type, e);
         }
     }
@@ -513,7 +495,6 @@ public class GsonUtil {
             JsonObject jsonObj = element.getAsJsonObject();
             return jsonObj.get(key);
         } catch (JsonSyntaxException e) {
-            log.error("gson get object from json error, json: {}, key: {}", json, key, e);
             throw new GsonException("gson get object from json error, json: {}, key: {}", json, key, e);
         }
     }
@@ -582,7 +563,6 @@ public class GsonUtil {
         try {
             return JsonParser.parseString(json).isJsonObject();
         } catch (Exception e) {
-            log.error("gson check json error, json: {}", json, e);
             return false;
         }
     }

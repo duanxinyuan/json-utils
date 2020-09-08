@@ -1,10 +1,11 @@
 package com.dxy.library.json.jackson.extend;
 
+import com.dxy.library.json.jackson.JacksonUtil;
+import com.dxy.library.json.jackson.exception.JacksonException;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvParser;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
@@ -16,8 +17,6 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;
 import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.dxy.library.json.jackson.JacksonUtil;
-import com.dxy.library.json.jackson.exception.JacksonException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ClassUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -51,64 +50,32 @@ public class JacksonExtendUtil extends JacksonUtil {
     static {
         try {
             //初始化
-            initMapper();
-            //配置序列化级别
-            configPropertyInclusion();
-            //配置JSON缩进支持
-            configIndentOutput();
-            //配置普通属性
-            configCommon();
-            //配置特殊属性
-            configSpecial();
+            yamlMapper = YAMLMapper.builder().build();
+            propsMapper = JavaPropsMapper.builder().build();
+            csvMapper = CsvMapper.builder().build();
+            xmlMapper = XmlMapper.builder().build();
+
+            initMapperConfig(yamlMapper);
+            initMapperConfig(propsMapper);
+            initMapperConfig(csvMapper);
+            initMapperConfig(xmlMapper);
+            //使用系统换行符
+            yamlMapper.enable(YAMLGenerator.Feature.USE_PLATFORM_LINE_BREAKS);
+            //允许注释
+            yamlMapper.enable(JsonParser.Feature.ALLOW_COMMENTS);
+            yamlMapper.enable(JsonParser.Feature.ALLOW_YAML_COMMENTS);
+            //允许注释
+            propsMapper.enable(JavaPropsParser.Feature.ALLOW_COMMENTS);
+            propsMapper.enable(JavaPropsParser.Feature.ALLOW_YAML_COMMENTS);
+            //去掉头尾空格
+            csvMapper.enable(CsvParser.Feature.TRIM_SPACES);
+            //忽略空行
+            csvMapper.enable(CsvParser.Feature.SKIP_EMPTY_LINES);
+            csvMapper.enable(CsvParser.Feature.WRAP_AS_ARRAY);
         } catch (Exception e) {
             log.error("jackson config error", e);
         }
     }
-
-    private static void initMapper() {
-        yamlMapper = new YAMLMapper();
-        propsMapper = new JavaPropsMapper();
-        csvMapper = new CsvMapper();
-        xmlMapper = new XmlMapper();
-    }
-
-    private static void configCommon() {
-        config(yamlMapper);
-        config(propsMapper);
-        config(csvMapper);
-        config(xmlMapper);
-    }
-
-    private static void configPropertyInclusion() {
-        yamlMapper.setSerializationInclusion(DEFAULT_PROPERTY_INCLUSION);
-        propsMapper.setSerializationInclusion(DEFAULT_PROPERTY_INCLUSION);
-        csvMapper.setSerializationInclusion(DEFAULT_PROPERTY_INCLUSION);
-        xmlMapper.setSerializationInclusion(DEFAULT_PROPERTY_INCLUSION);
-    }
-
-    private static void configIndentOutput() {
-        yamlMapper.configure(SerializationFeature.INDENT_OUTPUT, IS_ENABLE_INDENT_OUTPUT);
-        propsMapper.configure(SerializationFeature.INDENT_OUTPUT, IS_ENABLE_INDENT_OUTPUT);
-        csvMapper.configure(SerializationFeature.INDENT_OUTPUT, IS_ENABLE_INDENT_OUTPUT);
-        xmlMapper.configure(SerializationFeature.INDENT_OUTPUT, IS_ENABLE_INDENT_OUTPUT);
-    }
-
-    private static void configSpecial() {
-        //使用系统换行符
-        yamlMapper.enable(YAMLGenerator.Feature.USE_PLATFORM_LINE_BREAKS);
-        //允许注释
-        yamlMapper.enable(JsonParser.Feature.ALLOW_COMMENTS);
-        yamlMapper.enable(JsonParser.Feature.ALLOW_YAML_COMMENTS);
-        //允许注释
-        propsMapper.enable(JavaPropsParser.Feature.ALLOW_COMMENTS);
-        propsMapper.enable(JavaPropsParser.Feature.ALLOW_YAML_COMMENTS);
-        //去掉头尾空格
-        csvMapper.enable(CsvParser.Feature.TRIM_SPACES);
-        //忽略空行
-        csvMapper.enable(CsvParser.Feature.SKIP_EMPTY_LINES);
-        csvMapper.enable(CsvParser.Feature.WRAP_AS_ARRAY);
-    }
-
 
     /**
      * 反序列化Resources目录下的Yaml文件
@@ -138,7 +105,6 @@ public class JacksonExtendUtil extends JacksonUtil {
             JavaType javaType = yamlMapper.getTypeFactory().constructType(type);
             return yamlMapper.readValue(reader, javaType);
         } catch (IOException e) {
-            log.error("jackson from yaml resource error, name: {}, type: {}", name, type, e);
             throw new JacksonException("jackson from yaml resource error, name: {}, type: {}", name, type, e);
         }
     }
@@ -168,7 +134,6 @@ public class JacksonExtendUtil extends JacksonUtil {
             JavaType javaType = yamlMapper.getTypeFactory().constructType(type);
             return yamlMapper.readValue(new File(path), javaType);
         } catch (IOException e) {
-            log.error("jackson from yaml file error, path: {}, type: {}", path, type, e);
             throw new JacksonException("jackson from yaml file error, path: {}, type: {}", path, type, e);
         }
     }
@@ -201,7 +166,6 @@ public class JacksonExtendUtil extends JacksonUtil {
             JavaType javaType = propsMapper.getTypeFactory().constructType(type);
             return propsMapper.readValue(reader, javaType);
         } catch (IOException e) {
-            log.error("jackson from properties resource error, name: {}, type: {}", name, type, e);
             throw new JacksonException("jackson from properties resource error, name: {}, type: {}", name, type, e);
         }
     }
@@ -254,7 +218,6 @@ public class JacksonExtendUtil extends JacksonUtil {
             JavaType javaType = csvMapper.getTypeFactory().constructType(type);
             return (List<V>) csvMapper.reader(schema).forType(javaType).readValues(reader).readAll();
         } catch (IOException e) {
-            log.error("jackson from csv resource error, name: {}, type: {}", name, type, e);
             throw new JacksonException("jackson from csv resource error, name: {}, type: {}", name, type, e);
         }
     }
@@ -304,7 +267,6 @@ public class JacksonExtendUtil extends JacksonUtil {
             JavaType javaType = csvMapper.getTypeFactory().constructType(type);
             return (List<V>) csvMapper.reader(schema).forType(javaType).readValues(new File(path)).readAll();
         } catch (IOException e) {
-            log.error("jackson from csv file error, path: {}, type: {}", path, type, e);
             throw new JacksonException("jackson from csv file error, path: {}, type: {}", path, type, e);
         }
     }
@@ -339,7 +301,6 @@ public class JacksonExtendUtil extends JacksonUtil {
             JavaType javaType = xmlMapper.getTypeFactory().constructType(type);
             return xmlMapper.readValue(reader, javaType);
         } catch (IOException e) {
-            log.error("jackson from xml resource error, name: {}, type: {}", name, type, e);
             throw new JacksonException("jackson from xml resource error, name: {}, type: {}", name, type, e);
         }
     }
@@ -369,7 +330,6 @@ public class JacksonExtendUtil extends JacksonUtil {
             JavaType javaType = xmlMapper.getTypeFactory().constructType(type);
             return xmlMapper.readValue(new File(path), javaType);
         } catch (IOException e) {
-            log.error("jackson from xml file error, path: {}, type: {}", path, type, e);
             throw new JacksonException("jackson from xml file error, path: {}, type: {}", path, type, e);
         }
     }
@@ -399,7 +359,6 @@ public class JacksonExtendUtil extends JacksonUtil {
             JavaType javaType = xmlMapper.getTypeFactory().constructType(type);
             return xmlMapper.readValue(xml, javaType);
         } catch (IOException e) {
-            log.error("jackson from xml error, xml: {}, type: {}", xml, type, e);
             throw new JacksonException("jackson from xml error, xml: {}, type: {}", xml, type, e);
         }
     }
@@ -411,7 +370,6 @@ public class JacksonExtendUtil extends JacksonUtil {
         try {
             return yamlMapper.writeValueAsString(v);
         } catch (JsonProcessingException e) {
-            log.error("jackson to yaml error, data: {}", v, e);
             throw new JacksonException("jackson to yaml error, data: {}", v, e);
         }
     }
@@ -423,7 +381,6 @@ public class JacksonExtendUtil extends JacksonUtil {
         try (Writer writer = new FileWriter(new File(path), true)) {
             yamlMapper.writeValue(writer, v);
         } catch (Exception e) {
-            log.error("jackson to yaml file error, path: {}, data: {}", path, v, e);
             throw new JacksonException("jackson to yaml file error, path: {}, data: {}", path, v, e);
         }
     }
@@ -436,7 +393,6 @@ public class JacksonExtendUtil extends JacksonUtil {
             String string = propsMapper.writeValueAsString(v);
             return StringEscapeUtils.unescapeJava(string);
         } catch (JsonProcessingException e) {
-            log.error("jackson to properties error, data: {}", v, e);
             throw new JacksonException("jackson to properties error, data: {}", v, e);
         }
     }
@@ -449,7 +405,6 @@ public class JacksonExtendUtil extends JacksonUtil {
             JavaPropsSchema schema = JavaPropsSchema.emptySchema();
             propsMapper.writer(schema).writeValues(writer).write(v);
         } catch (Exception e) {
-            log.error("jackson to properties file error, path: {}, data: {}", path, v, e);
             throw new JacksonException("jackson to properties file error, path: {}, data: {}", path, v, e);
         }
     }
@@ -470,7 +425,6 @@ public class JacksonExtendUtil extends JacksonUtil {
             CsvSchema schema = csvMapper.schemaFor(type).withHeader().withColumnSeparator(separator.charAt(0));
             return csvMapper.writer(schema).writeValueAsString(list);
         } catch (JsonProcessingException e) {
-            log.error("jackson to csv error, data: {}", list, e);
             throw new JacksonException("jackson to csv error, data: {}", list, e);
         }
     }
@@ -490,7 +444,6 @@ public class JacksonExtendUtil extends JacksonUtil {
             CsvSchema schema = csvMapper.schemaFor(v.getClass()).withHeader().withColumnSeparator(separator.charAt(0));
             return csvMapper.writer(schema).writeValueAsString(v);
         } catch (JsonProcessingException e) {
-            log.error("jackson to csv error, data: {}", v, e);
             throw new JacksonException("jackson to csv error, data: {}", v, e);
         }
     }
@@ -511,7 +464,6 @@ public class JacksonExtendUtil extends JacksonUtil {
             CsvSchema schema = csvMapper.schemaFor(type).withHeader().withColumnSeparator(separator.charAt(0));
             csvMapper.writer(schema).writeValues(writer).writeAll(list);
         } catch (Exception e) {
-            log.error("jackson to csv file error, path: {}, separator: {}, list: {}", path, separator, list, e);
             throw new JacksonException("jackson to csv file error, path: {}, separator: {}, list: {}", path, separator, list, e);
         }
     }
@@ -531,7 +483,6 @@ public class JacksonExtendUtil extends JacksonUtil {
             CsvSchema schema = csvMapper.schemaFor(v.getClass()).withHeader().withColumnSeparator(separator.charAt(0));
             csvMapper.writer(schema).writeValues(writer).write(v);
         } catch (Exception e) {
-            log.error("jackson to csv file error, path: {}, separator: {}, data: {}", path, separator, v, e);
             throw new JacksonException("jackson to csv file error, path: {}, separator: {}, data: {}", path, separator, v, e);
         }
     }
@@ -555,7 +506,6 @@ public class JacksonExtendUtil extends JacksonUtil {
                 return xmlMapper.writeValueAsString(v);
             }
         } catch (JsonProcessingException e) {
-            log.error("jackson to xml error, data: {}, isIndent, {}", v, isIndent, e);
             throw new JacksonException("jackson to xml error, data: {}, isIndent, {}", v, isIndent, e);
         }
     }
@@ -578,7 +528,6 @@ public class JacksonExtendUtil extends JacksonUtil {
                 xmlMapper.writeValue(writer, v);
             }
         } catch (Exception e) {
-            log.error("jackson to xml file error, path: {}, data: {}, isIndent: {}", path, v, isIndent, e);
             throw new JacksonException("jackson to xml file error, path: {}, data: {}, isIndent: {}", path, v, isIndent, e);
         }
     }
