@@ -54,7 +54,7 @@
         <slf4j-api.version>1.7.30</slf4j-api.version>
         <lombok.version>1.18.12</lombok.version>
         <junit.version>4.13.1</junit.version>
-        <log4j2.version>2.12.1</log4j2.version>
+        <log4j2.version>2.14.0</log4j2.version>
 
         <commons-lang3.version>3.9</commons-lang3.version>
         <commons-text.version>1.8</commons-text.version>
