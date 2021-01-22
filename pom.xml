@@ -43,7 +43,7 @@
     </developers>
 
     <properties>
-        <json-utils.version>1.0.0</json-utils.version>
+        <json-utils.version>1.1.0</json-utils.version>
         <exception-formative.version>1.0.0</exception-formative.version>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -179,8 +179,8 @@
                         <artifactId>maven-compiler-plugin</artifactId>
                         <version>${maven-compiler-plugin.version}</version>
                         <configuration>
-                            <source>14</source>
-                            <target>14</target>
+                            <source>1.8</source>
+                            <target>1.8</target>
                         </configuration>
                     </plugin>
                     <plugin>
@@ -201,7 +201,7 @@
                         <artifactId>maven-javadoc-plugin</artifactId>
                         <version>3.2.0</version>
                         <configuration>
-                            <javadocExecutable>${java.home}/bin/javadoc</javadocExecutable>
+<!--                            <javadocExecutable>${java.home}/bin/javadoc</javadocExecutable>-->
                             <doclint>none</doclint>
                         </configuration>
                         <executions>
