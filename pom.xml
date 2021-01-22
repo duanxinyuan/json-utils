@@ -44,7 +44,6 @@
 
     <properties>
         <json-utils.version>1.1.0</json-utils.version>
-        <exception-formative.version>1.0.0</exception-formative.version>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -125,7 +124,7 @@
             <dependency>
                 <groupId>com.github.duanxinyuan</groupId>
                 <artifactId>exception-formative</artifactId>
-                <version>${exception-formative.version}</version>
+                <version>${json-utils.version}</version>
             </dependency>
 
             <!--Gson-->
