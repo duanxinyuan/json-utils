@@ -1,19 +1,22 @@
 package com.dxy.library.json.fastjson;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
-import com.alibaba.fastjson.TypeReference;
-import com.alibaba.fastjson.serializer.SerializerFeature;
-import com.dxy.library.json.fastjson.exception.FastjsonException;
-import org.apache.commons.lang3.StringUtils;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.List;
+
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.TypeReference;
+import com.alibaba.fastjson.parser.Feature;
+import com.alibaba.fastjson.serializer.SerializerFeature;
+
+import com.dxy.library.json.fastjson.exception.FastjsonException;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * FastJson工具类
@@ -23,7 +26,17 @@ import java.util.List;
  * @author duanxinyuan
  * 2018/6/28 22:55
  */
+@Slf4j
 public class FastjsonUtil {
+
+    static {
+        //屏蔽JSON中的 $ref
+        JSON.DEFAULT_GENERATE_FEATURE |= SerializerFeature.DisableCircularReferenceDetect.getMask();
+        //序列化没有set方法的private字段
+        JSON.DEFAULT_PARSER_FEATURE |= Feature.SupportNonPublicField.getMask();
+        //忽略get方法抛出的异常
+        JSON.DEFAULT_GENERATE_FEATURE |= SerializerFeature.IgnoreErrorGetter.getMask();
+    }
 
     /**
      * JSON反序列化
@@ -304,9 +317,11 @@ public class FastjsonUtil {
      * @return json
      */
     public static <V> String add(String json, String key, V value) {
-        JSONObject jsonObject = JSON.parseObject(json);
-        add(jsonObject, key, value);
-        return jsonObject.toString();
+        Object object = JSON.parse(json);
+        if (object instanceof JSONObject) {
+            add((JSONObject)object, key, value);
+        }
+        return object.toString();
     }
 
     /**
@@ -325,18 +340,23 @@ public class FastjsonUtil {
      * @return json
      */
     public static String remove(String json, String key) {
-        JSONObject jsonObject = JSON.parseObject(json);
-        jsonObject.remove(key);
-        return jsonObject.toString();
+        Object object = JSON.parse(json);
+        if (object instanceof JSONObject) {
+            ((JSONObject)object).remove(key);
+        }
+        return object.toString();
     }
 
     /**
      * 修改json中的属性
      */
     public static <V> String update(String json, String key, V value) {
-        JSONObject jsonObject = JSON.parseObject(json);
-        add(jsonObject, key, value);
-        return jsonObject.toString();
+        Object object = JSON.parse(json);
+        if (object instanceof JSONObject) {
+            add((JSONObject)object, key, value);
+            ((JSONObject)object).remove(key);
+        }
+        return object.toString();
     }
 
     /**

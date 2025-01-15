@@ -1,19 +1,37 @@
 package com.dxy.library.json.gson;
 
-import com.dxy.library.json.gson.adapter.NumberTypeAdapter;
-import com.dxy.library.json.gson.exception.GsonException;
-import com.google.gson.*;
-import com.google.gson.reflect.TypeToken;
-import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonWriter;
-import org.apache.commons.lang3.BooleanUtils;
-import org.apache.commons.lang3.StringUtils;
-
-import java.io.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.StringReader;
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.google.gson.JsonPrimitive;
+import com.google.gson.JsonSyntaxException;
+import com.google.gson.reflect.TypeToken;
+import com.google.gson.stream.JsonReader;
+import com.google.gson.stream.JsonWriter;
+import com.dxy.library.json.gson.adapter.NumberTypeAdapter;
+import com.dxy.library.json.gson.exception.GsonException;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.BooleanUtils;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * Gson工具类
@@ -24,14 +42,17 @@ import java.util.*;
  * @author duanxinyuan
  * 2015/5/27 16:53
  */
+@Slf4j
 public class GsonUtil {
-    private static Gson gson;
+    private static final Gson GSON;
+    private static final Gson GSON_PRETTY;
 
     static {
         GsonBuilder gsonBuilder = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss");
         gsonBuilder.disableHtmlEscaping();//禁止将部分特殊字符转义为unicode编码
         registerTypeAdapter(gsonBuilder);
-        gson = gsonBuilder.create();
+        GSON = gsonBuilder.create();
+        GSON_PRETTY = new GsonBuilder().setPrettyPrinting().create();
     }
 
     private static void registerTypeAdapter(GsonBuilder gsonBuilder) {
@@ -53,7 +74,7 @@ public class GsonUtil {
      */
     public static <V> V from(InputStream inputStream, Class<V> type) {
         JsonReader reader = new JsonReader(new InputStreamReader(Objects.requireNonNull(inputStream)));
-        return gson.fromJson(reader, type);
+        return GSON.fromJson(reader, type);
     }
 
     /**
@@ -61,7 +82,7 @@ public class GsonUtil {
      */
     public static <V> V from(InputStream inputStream, TypeToken<V> typeToken) {
         JsonReader reader = new JsonReader(new InputStreamReader(Objects.requireNonNull(inputStream)));
-        return gson.fromJson(reader, typeToken.getType());
+        return GSON.fromJson(reader, typeToken.getType());
     }
 
     /**
@@ -69,8 +90,8 @@ public class GsonUtil {
      */
     public static <V> List<V> fromList(InputStream inputStream, Class<V> type) {
         JsonReader reader = new JsonReader(new InputStreamReader(Objects.requireNonNull(inputStream)));
-        TypeToken<List<V>> typeToken = (TypeToken<List<V>>) TypeToken.getParameterized(ArrayList.class, type);
-        return gson.fromJson(reader, typeToken.getType());
+        TypeToken<List<V>> typeToken = (TypeToken<List<V>>)TypeToken.getParameterized(ArrayList.class, type);
+        return GSON.fromJson(reader, typeToken.getType());
     }
 
     /**
@@ -79,7 +100,7 @@ public class GsonUtil {
     public static <V> V from(File file, Class<V> type) {
         try {
             JsonReader reader = new JsonReader(new FileReader(file));
-            return gson.fromJson(reader, type);
+            return GSON.fromJson(reader, type);
         } catch (FileNotFoundException e) {
             throw new GsonException("gson from error, file path: {}, type: {}", file.getPath(), type, e);
         }
@@ -91,7 +112,7 @@ public class GsonUtil {
     public static <V> V from(File file, TypeToken<V> typeToken) {
         try {
             JsonReader reader = new JsonReader(new FileReader(file));
-            return gson.fromJson(reader, typeToken.getType());
+            return GSON.fromJson(reader, typeToken.getType());
         } catch (FileNotFoundException e) {
             throw new GsonException("gson from error, file path: {}, type: {}", file.getPath(), typeToken.getType(), e);
         }
@@ -103,8 +124,8 @@ public class GsonUtil {
     public static <V> List<V> fromList(File file, Class<V> type) {
         try {
             JsonReader reader = new JsonReader(new FileReader(file));
-            TypeToken<List<V>> typeToken = (TypeToken<List<V>>) TypeToken.getParameterized(ArrayList.class, type);
-            return gson.fromJson(reader, typeToken.getType());
+            TypeToken<List<V>> typeToken = (TypeToken<List<V>>)TypeToken.getParameterized(ArrayList.class, type);
+            return GSON.fromJson(reader, typeToken.getType());
         } catch (FileNotFoundException e) {
             throw new GsonException("gson from error, file path: {}, type: {}", file.getPath(), type, e);
         }
@@ -114,36 +135,36 @@ public class GsonUtil {
      * JSON反序列化
      */
     public static <V> V from(String json, Class<V> type) {
-        return gson.fromJson(json, type);
+        return GSON.fromJson(json, type);
     }
 
     /**
      * JSON反序列化
      */
     public static <V> V from(String json, Type type) {
-        return gson.fromJson(json, type);
+        return GSON.fromJson(json, type);
     }
 
     /**
      * JSON反序列化
      */
     public static <V> V from(String json, TypeToken<V> typeToken) {
-        return gson.fromJson(json, typeToken.getType());
+        return GSON.fromJson(json, typeToken.getType());
     }
 
     /**
      * JSON反序列化（List）
      */
     public static <V> List<V> fromList(String json, Class<V> type) {
-        TypeToken<List<V>> typeToken = (TypeToken<List<V>>) TypeToken.getParameterized(ArrayList.class, type);
-        return gson.fromJson(json, typeToken.getType());
+        TypeToken<List<V>> typeToken = (TypeToken<List<V>>)TypeToken.getParameterized(ArrayList.class, type);
+        return GSON.fromJson(json, typeToken.getType());
     }
 
     /**
      * JSON反序列化（Map）
      */
     public static Map<String, Object> fromMap(String json) {
-        return gson.fromJson(json, new TypeToken<HashMap<String, Object>>() {}.getType());
+        return GSON.fromJson(json, new TypeToken<HashMap<String, Object>>() {}.getType());
     }
 
     /**
@@ -152,7 +173,7 @@ public class GsonUtil {
     public static <V> V fromLenient(InputStream inputStream, Class<V> type) {
         JsonReader reader = new JsonReader(new InputStreamReader(Objects.requireNonNull(inputStream)));
         reader.setLenient(true);
-        return gson.fromJson(reader, type);
+        return GSON.fromJson(reader, type);
     }
 
     /**
@@ -161,8 +182,8 @@ public class GsonUtil {
     public static <V> List<V> fromListLenient(InputStream inputStream, Class<V> type) {
         JsonReader reader = new JsonReader(new InputStreamReader(Objects.requireNonNull(inputStream)));
         reader.setLenient(true);
-        TypeToken<List<V>> typeToken = (TypeToken<List<V>>) TypeToken.getParameterized(ArrayList.class, type);
-        return gson.fromJson(reader, typeToken.getType());
+        TypeToken<List<V>> typeToken = (TypeToken<List<V>>)TypeToken.getParameterized(ArrayList.class, type);
+        return GSON.fromJson(reader, typeToken.getType());
     }
 
     /**
@@ -172,7 +193,7 @@ public class GsonUtil {
         try {
             JsonReader reader = new JsonReader(new FileReader(file));
             reader.setLenient(true);
-            return gson.fromJson(reader, type);
+            return GSON.fromJson(reader, type);
         } catch (FileNotFoundException e) {
             throw new GsonException("gson lenient from error, file path: {}, type: {}", file.getPath(), type, e);
         }
@@ -185,8 +206,8 @@ public class GsonUtil {
         try {
             JsonReader reader = new JsonReader(new FileReader(file));
             reader.setLenient(true);
-            TypeToken<List<V>> typeToken = (TypeToken<List<V>>) TypeToken.getParameterized(ArrayList.class, type);
-            return gson.fromJson(reader, typeToken.getType());
+            TypeToken<List<V>> typeToken = (TypeToken<List<V>>)TypeToken.getParameterized(ArrayList.class, type);
+            return GSON.fromJson(reader, typeToken.getType());
         } catch (FileNotFoundException e) {
             throw new GsonException("gson lenient from error, file path: {}, type: {}", file.getPath(), type, e);
         }
@@ -201,7 +222,7 @@ public class GsonUtil {
         }
         JsonReader reader = new JsonReader(new StringReader(json));
         reader.setLenient(true);
-        return gson.fromJson(reader, type);
+        return GSON.fromJson(reader, type);
     }
 
     /**
@@ -213,7 +234,7 @@ public class GsonUtil {
         }
         JsonReader reader = new JsonReader(new StringReader(json));
         reader.setLenient(true);
-        return gson.fromJson(reader, type);
+        return GSON.fromJson(reader, type);
     }
 
     /**
@@ -225,7 +246,7 @@ public class GsonUtil {
         }
         JsonReader reader = new JsonReader(new StringReader(json));
         reader.setLenient(true);
-        return gson.fromJson(reader, typeToken.getType());
+        return GSON.fromJson(reader, typeToken.getType());
     }
 
     /**
@@ -237,22 +258,22 @@ public class GsonUtil {
         }
         JsonReader reader = new JsonReader(new StringReader(json));
         reader.setLenient(true);
-        TypeToken<List<V>> typeToken = (TypeToken<List<V>>) TypeToken.getParameterized(ArrayList.class, type);
-        return gson.fromJson(reader, typeToken.getType());
+        TypeToken<List<V>> typeToken = (TypeToken<List<V>>)TypeToken.getParameterized(ArrayList.class, type);
+        return GSON.fromJson(reader, typeToken.getType());
     }
 
     /**
      * 序列化为JSON
      */
     public static <V> String to(List<V> list) {
-        return gson.toJson(list);
+        return GSON.toJson(list);
     }
 
     /**
      * 序列化为JSON
      */
     public static <V> String to(V v) {
-        return gson.toJson(v);
+        return GSON.toJson(v);
     }
 
     /**
@@ -260,7 +281,7 @@ public class GsonUtil {
      */
     public static <V> void toFile(String path, List<V> list) {
         try (JsonWriter jsonWriter = new JsonWriter(new FileWriter(new File(path), true));) {
-            gson.toJson(list, new TypeToken<List<V>>() {}.getType(), jsonWriter);
+            GSON.toJson(list, new TypeToken<List<V>>() {}.getType(), jsonWriter);
             jsonWriter.flush();
         } catch (Exception e) {
             throw new GsonException("gson to file error, path: {}, list: {}", path, list, e);
@@ -272,7 +293,7 @@ public class GsonUtil {
      */
     public static <V> void toFile(String path, V v) {
         try (JsonWriter jsonWriter = new JsonWriter(new FileWriter(new File(path), true));) {
-            gson.toJson(v, v.getClass(), jsonWriter);
+            GSON.toJson(v, v.getClass(), jsonWriter);
             jsonWriter.flush();
         } catch (Exception e) {
             throw new GsonException("gson to file error, path: {}, obj: {}", path, v, e);
@@ -403,7 +424,7 @@ public class GsonUtil {
         if (StringUtils.isEmpty(json)) {
             return false;
         }
-        JsonPrimitive jsonByKey = (JsonPrimitive) getAsJsonObject(json, key);
+        JsonPrimitive jsonByKey = (JsonPrimitive)getAsJsonObject(json, key);
         if (null == jsonByKey) {
             return false;
         }
@@ -479,7 +500,7 @@ public class GsonUtil {
         }
         try {
             JsonArray jsonArray = jsonByKey.getAsJsonArray();
-            TypeToken<List<V>> typeToken = (TypeToken<List<V>>) TypeToken.getParameterized(ArrayList.class, type);
+            TypeToken<List<V>> typeToken = (TypeToken<List<V>>)TypeToken.getParameterized(ArrayList.class, type);
             return from(jsonArray.toString(), typeToken);
         } catch (Exception e) {
             throw new GsonException("gson get list error, json: {}, key: {}, type: {}", json, key, type, e);
@@ -515,9 +536,9 @@ public class GsonUtil {
      */
     private static <V> void add(JsonObject jsonObject, String key, V value) {
         if (value instanceof String) {
-            jsonObject.addProperty(key, (String) value);
+            jsonObject.addProperty(key, (String)value);
         } else if (value instanceof Number) {
-            jsonObject.addProperty(key, (Number) value);
+            jsonObject.addProperty(key, (Number)value);
         } else {
             jsonObject.addProperty(key, to(value));
         }
@@ -529,9 +550,11 @@ public class GsonUtil {
      */
     public static String remove(String json, String key) {
         JsonElement element = JsonParser.parseString(json);
-        JsonObject jsonObj = element.getAsJsonObject();
-        jsonObj.remove(key);
-        return jsonObj.toString();
+        if (element.isJsonObject()) {
+            JsonObject jsonObj = element.getAsJsonObject();
+            jsonObj.remove(key);
+        }
+        return element.toString();
     }
 
     /**
@@ -550,9 +573,8 @@ public class GsonUtil {
      * @return json
      */
     public static String format(String json) {
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
         JsonElement jsonElement = JsonParser.parseString(json);
-        return gson.toJson(jsonElement);
+        return GSON_PRETTY.toJson(jsonElement);
     }
 
     /**
