@@ -1,10 +1,14 @@
-import lombok.Data;
-
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+
+import lombok.Data;
 
 /**
  * @author duanxinyuan
@@ -15,6 +19,8 @@ public class Person {
     private String name;
     private Date date;
     private LocalDateTime localDateTime;
+    private LocalDate localDate;
+    private LocalTime localTime;
     private int age;
     private BigDecimal money;
     private boolean man;
@@ -24,8 +30,12 @@ public class Person {
     public static Person newPerson() {
         Person person = new Person();
         person.setName("张三");
-        person.date = new Date();
-        person.setLocalDateTime(LocalDateTime.now());
+        LocalDateTime localDateTime = LocalDateTime.parse("2022-03-10 00:00:00",
+            DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+        person.date = Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
+        person.setLocalDateTime(localDateTime);
+        person.setLocalDate(LocalDate.parse("2022-03-10", DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+        person.setLocalTime(LocalTime.parse("19:36:19", DateTimeFormatter.ofPattern("HH:mm:ss")));
         person.setAge(100);
         person.setMoney(BigDecimal.valueOf(500.21));
         person.setMan(true);

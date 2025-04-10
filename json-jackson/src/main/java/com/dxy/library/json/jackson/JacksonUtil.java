@@ -1,16 +1,40 @@
 package com.dxy.library.json.jackson;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.Writer;
+import java.lang.reflect.Type;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.net.URL;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import com.dxy.library.json.jackson.exception.JacksonException;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.json.JsonReadFeature;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.*;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.type.CollectionType;
 import com.fasterxml.jackson.databind.type.MapType;
+import com.fasterxml.jackson.databind.type.SimpleType;
 import com.fasterxml.jackson.datatype.guava.GuavaModule;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -21,16 +45,6 @@ import com.google.common.collect.Sets;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
-
-import java.io.*;
-import java.lang.reflect.Type;
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.net.URL;
-import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.*;
 
 /**
  * Jackson工具类
@@ -46,22 +60,22 @@ public class JacksonUtil {
     private static ObjectMapper mapper;
 
     private static final Set<JsonReadFeature> JSON_READ_FEATURES_ENABLED = Sets.newHashSet(
-            //允许在JSON中使用Java注释
-            JsonReadFeature.ALLOW_JAVA_COMMENTS,
-            //允许 json 存在没用双引号括起来的 field
-            JsonReadFeature.ALLOW_UNQUOTED_FIELD_NAMES,
-            //允许 json 存在使用单引号括起来的 field
-            JsonReadFeature.ALLOW_SINGLE_QUOTES,
-            //允许 json 存在没用引号括起来的 ascii 控制字符
-            JsonReadFeature.ALLOW_UNESCAPED_CONTROL_CHARS,
-            //允许 json number 类型的数存在前导 0 (例: 0001)
-            JsonReadFeature.ALLOW_LEADING_ZEROS_FOR_NUMBERS,
-            //允许 json 存在 NaN, INF, -INF 作为 number 类型
-            JsonReadFeature.ALLOW_NON_NUMERIC_NUMBERS,
-            //允许 只有Key没有Value的情况
-            JsonReadFeature.ALLOW_MISSING_VALUES,
-            //允许数组json的结尾多逗号
-            JsonReadFeature.ALLOW_TRAILING_COMMA
+        //允许在JSON中使用Java注释
+        JsonReadFeature.ALLOW_JAVA_COMMENTS,
+        //允许 json 存在没用双引号括起来的 field
+        JsonReadFeature.ALLOW_UNQUOTED_FIELD_NAMES,
+        //允许 json 存在使用单引号括起来的 field
+        JsonReadFeature.ALLOW_SINGLE_QUOTES,
+        //允许 json 存在没用引号括起来的 ascii 控制字符
+        JsonReadFeature.ALLOW_UNESCAPED_CONTROL_CHARS,
+        //允许 json number 类型的数存在前导 0 (例: 0001)
+        JsonReadFeature.ALLOW_LEADING_ZEROS_FOR_NUMBERS,
+        //允许 json 存在 NaN, INF, -INF 作为 number 类型
+        JsonReadFeature.ALLOW_NON_NUMERIC_NUMBERS,
+        //允许 只有Key没有Value的情况
+        JsonReadFeature.ALLOW_MISSING_VALUES,
+        //允许数组json的结尾多逗号
+        JsonReadFeature.ALLOW_TRAILING_COMMA
     );
 
     static {
@@ -74,7 +88,8 @@ public class JacksonUtil {
     }
 
     public static ObjectMapper initMapper() {
-        JsonMapper.Builder builder = JsonMapper.builder().enable(JSON_READ_FEATURES_ENABLED.toArray(new JsonReadFeature[0]));
+        JsonMapper.Builder builder = JsonMapper.builder().enable(
+            JSON_READ_FEATURES_ENABLED.toArray(new JsonReadFeature[0]));
         return initMapperConfig(builder.build());
     }
 
@@ -105,8 +120,10 @@ public class JacksonUtil {
         objectMapper.registerModule(new ParameterNamesModule());
         objectMapper.registerModule(new Jdk8Module());
         JavaTimeModule javaTimeModule = new JavaTimeModule();
-        javaTimeModule.addSerializer(LocalDateTime.class, new LocalDateTimeSerializer(DateTimeFormatter.ofPattern(dateTimeFormat)))
-                .addDeserializer(LocalDateTime.class, new LocalDateTimeDeserializer(DateTimeFormatter.ofPattern(dateTimeFormat)));
+        javaTimeModule.addSerializer(LocalDateTime.class,
+                new LocalDateTimeSerializer(DateTimeFormatter.ofPattern(dateTimeFormat)))
+            .addDeserializer(LocalDateTime.class,
+                new LocalDateTimeDeserializer(DateTimeFormatter.ofPattern(dateTimeFormat)));
         objectMapper.registerModule(javaTimeModule);
         //识别Guava包的类
         objectMapper.registerModule(new GuavaModule());
@@ -223,7 +240,7 @@ public class JacksonUtil {
      * JSON反序列化
      */
     public static <V> V from(String json, Class<V> type) {
-        return from(json, (Type) type);
+        return from(json, (Type)type);
     }
 
     /**
@@ -251,6 +268,21 @@ public class JacksonUtil {
     /**
      * JSON反序列化（List）
      */
+    public static <V> Set<V> fromSet(String json, Class<V> type) {
+        if (StringUtils.isEmpty(json)) {
+            return null;
+        }
+        try {
+            CollectionType collectionType = mapper.getTypeFactory().constructCollectionType(HashSet.class, type);
+            return mapper.readValue(json, collectionType);
+        } catch (IOException e) {
+            throw new JacksonException("jackson from error, json: {}, type: {}", json, type, e);
+        }
+    }
+
+    /**
+     * JSON反序列化（List）
+     */
     public static <V> List<V> fromList(String json, Class<V> type) {
         if (StringUtils.isEmpty(json)) {
             return null;
@@ -266,15 +298,66 @@ public class JacksonUtil {
     /**
      * JSON反序列化（Map）
      */
-    public static Map<String, Object> fromMap(String json) {
+    public static <K, V> Map<K, V> fromMap(String json, Class<K> keyType, Class<V> valueType) {
         if (StringUtils.isEmpty(json)) {
             return null;
         }
         try {
-            MapType mapType = mapper.getTypeFactory().constructMapType(HashMap.class, String.class, Object.class);
+            MapType mapType = mapper.getTypeFactory().constructMapType(HashMap.class, keyType, valueType);
             return mapper.readValue(json, mapType);
         } catch (IOException e) {
-            throw new JacksonException("jackson from error, json: {}, type: {}", json, e);
+            throw new JacksonException("jackson from error, json: {}, keyType: {}, valueType: {}", json, e);
+        }
+    }
+
+    /**
+     * JSON反序列化（Map<K, List<V>>）
+     */
+    public static <K, V> Map<K, List<V>> fromListMap(String json, Class<K> keyType, Class<V> valueType) {
+        if (StringUtils.isEmpty(json)) {
+            return null;
+        }
+        try {
+            CollectionType collectionType = mapper.getTypeFactory().constructCollectionType(ArrayList.class, valueType);
+            MapType mapType = mapper.getTypeFactory().constructMapType(HashMap.class,
+                SimpleType.constructUnsafe(keyType), collectionType);
+            return mapper.readValue(json, mapType);
+        } catch (IOException e) {
+            throw new JacksonException("jackson from error, json: {}, keyType: {}, valueType: {}", json, e);
+        }
+    }
+
+    /**
+     * JSON反序列化（Map<K, Set<V>>）
+     */
+    public static <K, V> Map<K, Set<V>> fromSetMap(String json, Class<K> keyType, Class<V> valueType) {
+        if (StringUtils.isEmpty(json)) {
+            return null;
+        }
+        try {
+            CollectionType collectionType = mapper.getTypeFactory().constructCollectionType(HashSet.class, valueType);
+            MapType mapType = mapper.getTypeFactory().constructMapType(HashMap.class,
+                SimpleType.constructUnsafe(keyType), collectionType);
+            return mapper.readValue(json, mapType);
+        } catch (IOException e) {
+            throw new JacksonException("jackson from error, json: {}, keyType: {}, valueType: {}", json, e);
+        }
+    }
+
+    /**
+     * JSON反序列化（List<Map<K, V>>）
+     */
+    public static <K, V> List<Map<K, V>> fromMapList(String json, Class<K> keyType, Class<V> valueType) {
+        if (StringUtils.isEmpty(json)) {
+            return null;
+        }
+        try {
+            MapType mapType = mapper.getTypeFactory().constructMapType(HashMap.class,
+                SimpleType.constructUnsafe(keyType), SimpleType.constructUnsafe(valueType));
+            CollectionType collectionType = mapper.getTypeFactory().constructCollectionType(ArrayList.class, mapType);
+            return mapper.readValue(json, collectionType);
+        } catch (IOException e) {
+            throw new JacksonException("jackson from error, json: {}, keyType: {}, valueType: {}", json, e);
         }
     }
 
@@ -476,16 +559,17 @@ public class JacksonUtil {
      * 从json串中获取某个字段
      * @return byte[], 默认为 null
      */
-    public static byte[] getAsBytes(String json, String key) {
+    public static byte getAsByte(String json, String key) {
         if (StringUtils.isEmpty(json)) {
-            return null;
+            return 0;
         }
         try {
             JsonNode jsonNode = getAsJsonObject(json, key);
             if (null == jsonNode) {
-                return null;
+                return 0;
             }
-            return jsonNode.isBinary() ? jsonNode.binaryValue() : getAsString(jsonNode).getBytes();
+            return jsonNode.isInt() ? new Integer(jsonNode.intValue()).byteValue()
+                : Byte.parseByte(getAsString(jsonNode));
         } catch (Exception e) {
             throw new JacksonException("jackson get byte error, json: {}, key: {}", json, key, e);
         }
@@ -510,7 +594,6 @@ public class JacksonUtil {
             throw new JacksonException("jackson get list error, json: {}, key: {}, type: {}", json, key, type, e);
         }
     }
-
 
     /**
      * 从json串中获取某个字段
@@ -567,27 +650,27 @@ public class JacksonUtil {
      */
     private static <V> void add(JsonNode jsonNode, String key, V value) {
         if (value instanceof String) {
-            ((ObjectNode) jsonNode).put(key, (String) value);
+            ((ObjectNode)jsonNode).put(key, (String)value);
         } else if (value instanceof Short) {
-            ((ObjectNode) jsonNode).put(key, (Short) value);
+            ((ObjectNode)jsonNode).put(key, (Short)value);
         } else if (value instanceof Integer) {
-            ((ObjectNode) jsonNode).put(key, (Integer) value);
+            ((ObjectNode)jsonNode).put(key, (Integer)value);
         } else if (value instanceof Long) {
-            ((ObjectNode) jsonNode).put(key, (Long) value);
+            ((ObjectNode)jsonNode).put(key, (Long)value);
         } else if (value instanceof Float) {
-            ((ObjectNode) jsonNode).put(key, (Float) value);
+            ((ObjectNode)jsonNode).put(key, (Float)value);
         } else if (value instanceof Double) {
-            ((ObjectNode) jsonNode).put(key, (Double) value);
+            ((ObjectNode)jsonNode).put(key, (Double)value);
         } else if (value instanceof BigDecimal) {
-            ((ObjectNode) jsonNode).put(key, (BigDecimal) value);
+            ((ObjectNode)jsonNode).put(key, (BigDecimal)value);
         } else if (value instanceof BigInteger) {
-            ((ObjectNode) jsonNode).put(key, (BigInteger) value);
+            ((ObjectNode)jsonNode).put(key, (BigInteger)value);
         } else if (value instanceof Boolean) {
-            ((ObjectNode) jsonNode).put(key, (Boolean) value);
+            ((ObjectNode)jsonNode).put(key, (Boolean)value);
         } else if (value instanceof byte[]) {
-            ((ObjectNode) jsonNode).put(key, (byte[]) value);
+            ((ObjectNode)jsonNode).put(key, (byte[])value);
         } else {
-            ((ObjectNode) jsonNode).put(key, to(value));
+            ((ObjectNode)jsonNode).put(key, to(value));
         }
     }
 
@@ -598,7 +681,7 @@ public class JacksonUtil {
     public static String remove(String json, String key) {
         try {
             JsonNode node = mapper.readTree(json);
-            ((ObjectNode) node).remove(key);
+            ((ObjectNode)node).remove(key);
             return node.toString();
         } catch (IOException e) {
             throw new JacksonException("jackson remove error, json: {}, key: {}", json, key, e);
@@ -611,7 +694,7 @@ public class JacksonUtil {
     public static <V> String update(String json, String key, V value) {
         try {
             JsonNode node = mapper.readTree(json);
-            ((ObjectNode) node).remove(key);
+            ((ObjectNode)node).remove(key);
             add(node, key, value);
             return node.toString();
         } catch (IOException e) {

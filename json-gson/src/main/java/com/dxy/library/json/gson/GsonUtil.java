@@ -10,12 +10,34 @@ import java.io.StringReader;
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
+import com.dxy.library.json.gson.adapter.LocalDateAdapter;
+import com.dxy.library.json.gson.adapter.LocalDateTimeAdapter;
+import com.dxy.library.json.gson.adapter.LocalTimeAdapter;
+import com.dxy.library.json.gson.adapter.NumberTypeAdapter.AtomicIntegerAdapter;
+import com.dxy.library.json.gson.adapter.NumberTypeAdapter.AtomicLongAdapter;
+import com.dxy.library.json.gson.adapter.NumberTypeAdapter.BigDecimalAdapter;
+import com.dxy.library.json.gson.adapter.NumberTypeAdapter.BigDoubleAdapter;
+import com.dxy.library.json.gson.adapter.NumberTypeAdapter.BigFloatAdapter;
+import com.dxy.library.json.gson.adapter.NumberTypeAdapter.BigIntAdapter;
+import com.dxy.library.json.gson.adapter.NumberTypeAdapter.BigLongAdapter;
+import com.dxy.library.json.gson.adapter.NumberTypeAdapter.BigShortAdapter;
+import com.dxy.library.json.gson.adapter.NumberTypeAdapter.DoubleAdapter;
+import com.dxy.library.json.gson.adapter.NumberTypeAdapter.FloatAdapter;
+import com.dxy.library.json.gson.adapter.NumberTypeAdapter.IntAdapter;
+import com.dxy.library.json.gson.adapter.NumberTypeAdapter.LongAdapter;
+import com.dxy.library.json.gson.adapter.NumberTypeAdapter.ShortAdapter;
+import com.dxy.library.json.gson.exception.GsonException;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
@@ -24,11 +46,10 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSyntaxException;
+import com.google.gson.Strictness;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
-import com.dxy.library.json.gson.adapter.NumberTypeAdapter;
-import com.dxy.library.json.gson.exception.GsonException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -42,6 +63,7 @@ import org.apache.commons.lang3.StringUtils;
  * @author duanxinyuan
  * 2015/5/27 16:53
  */
+@SuppressWarnings("unchecked")
 @Slf4j
 public class GsonUtil {
     private static final Gson GSON;
@@ -56,17 +78,23 @@ public class GsonUtil {
     }
 
     private static void registerTypeAdapter(GsonBuilder gsonBuilder) {
-        gsonBuilder.registerTypeAdapter(short.class, new NumberTypeAdapter<>(short.class));
-        gsonBuilder.registerTypeAdapter(Short.class, new NumberTypeAdapter<>(Short.class));
-        gsonBuilder.registerTypeAdapter(int.class, new NumberTypeAdapter<>(int.class));
-        gsonBuilder.registerTypeAdapter(Integer.class, new NumberTypeAdapter<>(Integer.class));
-        gsonBuilder.registerTypeAdapter(long.class, new NumberTypeAdapter<>(long.class));
-        gsonBuilder.registerTypeAdapter(Long.class, new NumberTypeAdapter<>(Long.class));
-        gsonBuilder.registerTypeAdapter(float.class, new NumberTypeAdapter<>(float.class));
-        gsonBuilder.registerTypeAdapter(Float.class, new NumberTypeAdapter<>(Float.class));
-        gsonBuilder.registerTypeAdapter(double.class, new NumberTypeAdapter<>(double.class));
-        gsonBuilder.registerTypeAdapter(Double.class, new NumberTypeAdapter<>(Double.class));
-        gsonBuilder.registerTypeAdapter(BigDecimal.class, new NumberTypeAdapter<>(BigDecimal.class));
+        gsonBuilder.registerTypeAdapter(short.class, new ShortAdapter());
+        gsonBuilder.registerTypeAdapter(Short.class, new BigShortAdapter());
+        gsonBuilder.registerTypeAdapter(int.class, new IntAdapter());
+        gsonBuilder.registerTypeAdapter(Integer.class, new BigIntAdapter());
+        gsonBuilder.registerTypeAdapter(long.class, new LongAdapter());
+        gsonBuilder.registerTypeAdapter(Long.class, new BigLongAdapter());
+        gsonBuilder.registerTypeAdapter(float.class, new FloatAdapter());
+        gsonBuilder.registerTypeAdapter(Float.class, new BigFloatAdapter());
+        gsonBuilder.registerTypeAdapter(double.class, new DoubleAdapter());
+        gsonBuilder.registerTypeAdapter(Double.class, new BigDoubleAdapter());
+        gsonBuilder.registerTypeAdapter(BigDecimal.class, new BigDecimalAdapter());
+        gsonBuilder.registerTypeAdapter(AtomicInteger.class, new AtomicIntegerAdapter());
+        gsonBuilder.registerTypeAdapter(AtomicLong.class, new AtomicLongAdapter());
+
+        gsonBuilder.registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter());
+        gsonBuilder.registerTypeAdapter(LocalDate.class, new LocalDateAdapter());
+        gsonBuilder.registerTypeAdapter(LocalTime.class, new LocalTimeAdapter());
     }
 
     /**
@@ -82,15 +110,6 @@ public class GsonUtil {
      */
     public static <V> V from(InputStream inputStream, TypeToken<V> typeToken) {
         JsonReader reader = new JsonReader(new InputStreamReader(Objects.requireNonNull(inputStream)));
-        return GSON.fromJson(reader, typeToken.getType());
-    }
-
-    /**
-     * JSON反序列化（List）
-     */
-    public static <V> List<V> fromList(InputStream inputStream, Class<V> type) {
-        JsonReader reader = new JsonReader(new InputStreamReader(Objects.requireNonNull(inputStream)));
-        TypeToken<List<V>> typeToken = (TypeToken<List<V>>)TypeToken.getParameterized(ArrayList.class, type);
         return GSON.fromJson(reader, typeToken.getType());
     }
 
@@ -119,22 +138,12 @@ public class GsonUtil {
     }
 
     /**
-     * JSON反序列化（List）
-     */
-    public static <V> List<V> fromList(File file, Class<V> type) {
-        try {
-            JsonReader reader = new JsonReader(new FileReader(file));
-            TypeToken<List<V>> typeToken = (TypeToken<List<V>>)TypeToken.getParameterized(ArrayList.class, type);
-            return GSON.fromJson(reader, typeToken.getType());
-        } catch (FileNotFoundException e) {
-            throw new GsonException("gson from error, file path: {}, type: {}", file.getPath(), type, e);
-        }
-    }
-
-    /**
      * JSON反序列化
      */
     public static <V> V from(String json, Class<V> type) {
+        if (StringUtils.isEmpty(json)) {
+            return null;
+        }
         return GSON.fromJson(json, type);
     }
 
@@ -142,6 +151,9 @@ public class GsonUtil {
      * JSON反序列化
      */
     public static <V> V from(String json, Type type) {
+        if (StringUtils.isEmpty(json)) {
+            return null;
+        }
         return GSON.fromJson(json, type);
     }
 
@@ -149,6 +161,20 @@ public class GsonUtil {
      * JSON反序列化
      */
     public static <V> V from(String json, TypeToken<V> typeToken) {
+        if (StringUtils.isEmpty(json)) {
+            return null;
+        }
+        return GSON.fromJson(json, typeToken.getType());
+    }
+
+    /**
+     * JSON反序列化（Set）
+     */
+    public static <V> Set<V> fromSet(String json, Class<V> type) {
+        if (StringUtils.isEmpty(json)) {
+            return null;
+        }
+        TypeToken<Set<V>> typeToken = (TypeToken<Set<V>>)TypeToken.getParameterized(Set.class, type);
         return GSON.fromJson(json, typeToken.getType());
     }
 
@@ -156,15 +182,60 @@ public class GsonUtil {
      * JSON反序列化（List）
      */
     public static <V> List<V> fromList(String json, Class<V> type) {
-        TypeToken<List<V>> typeToken = (TypeToken<List<V>>)TypeToken.getParameterized(ArrayList.class, type);
+        TypeToken<List<V>> typeToken = (TypeToken<List<V>>)TypeToken.getParameterized(List.class, type);
         return GSON.fromJson(json, typeToken.getType());
     }
 
     /**
      * JSON反序列化（Map）
      */
-    public static Map<String, Object> fromMap(String json) {
-        return GSON.fromJson(json, new TypeToken<HashMap<String, Object>>() {}.getType());
+    public static <K, V> Map<K, V> fromMap(String json, Class<K> keyType, Class<V> valueType) {
+        if (StringUtils.isEmpty(json)) {
+            return null;
+        }
+        TypeToken<Map<K, V>> typeToken = (TypeToken<Map<K, V>>)TypeToken.getParameterized(Map.class, keyType,
+            valueType);
+        return GSON.fromJson(json, typeToken.getType());
+    }
+
+    /**
+     * JSON反序列化（Map<K, List<V>>）
+     */
+    public static <K, V> Map<K, List<V>> fromListMap(String json, Class<K> keyType, Class<V> valueType) {
+        if (StringUtils.isEmpty(json)) {
+            return null;
+        }
+        TypeToken<List<V>> valueTypeToken = (TypeToken<List<V>>)TypeToken.getParameterized(List.class, valueType);
+        TypeToken<Map<K, List<V>>> typeToken = (TypeToken<Map<K, List<V>>>)TypeToken.getParameterized(Map.class,
+            keyType, valueTypeToken.getType());
+        return GSON.fromJson(json, typeToken.getType());
+    }
+
+    /**
+     * JSON反序列化（Map<K, Set<V>>）
+     */
+    public static <K, V> Map<K, Set<V>> fromSetMap(String json, Class<K> keyType, Class<V> valueType) {
+        if (StringUtils.isEmpty(json)) {
+            return null;
+        }
+        TypeToken<Set<V>> valueTypeToken = (TypeToken<Set<V>>)TypeToken.getParameterized(Set.class, valueType);
+        TypeToken<Map<K, Set<V>>> typeToken = (TypeToken<Map<K, Set<V>>>)TypeToken.getParameterized(Map.class,
+            keyType, valueTypeToken.getType());
+        return GSON.fromJson(json, typeToken.getType());
+    }
+
+    /**
+     * JSON反序列化（List<Map<K, V>>）
+     */
+    public static <K, V> List<Map<K, V>> fromMapList(String json, Class<K> keyType, Class<V> valueType) {
+        if (StringUtils.isEmpty(json)) {
+            return null;
+        }
+        TypeToken<Map<K, V>> valueTypeToken = (TypeToken<Map<K, V>>)TypeToken.getParameterized(Map.class, keyType,
+            valueType);
+        TypeToken<List<Map<K, V>>> typeToken = (TypeToken<List<Map<K, V>>>)TypeToken.getParameterized(List.class,
+            valueTypeToken.getType());
+        return GSON.fromJson(json, typeToken.getType());
     }
 
     /**
@@ -172,7 +243,7 @@ public class GsonUtil {
      */
     public static <V> V fromLenient(InputStream inputStream, Class<V> type) {
         JsonReader reader = new JsonReader(new InputStreamReader(Objects.requireNonNull(inputStream)));
-        reader.setLenient(true);
+        reader.setStrictness(Strictness.LENIENT);
         return GSON.fromJson(reader, type);
     }
 
@@ -181,7 +252,7 @@ public class GsonUtil {
      */
     public static <V> List<V> fromListLenient(InputStream inputStream, Class<V> type) {
         JsonReader reader = new JsonReader(new InputStreamReader(Objects.requireNonNull(inputStream)));
-        reader.setLenient(true);
+        reader.setStrictness(Strictness.LENIENT);
         TypeToken<List<V>> typeToken = (TypeToken<List<V>>)TypeToken.getParameterized(ArrayList.class, type);
         return GSON.fromJson(reader, typeToken.getType());
     }
@@ -192,7 +263,7 @@ public class GsonUtil {
     public static <V> V fromLenient(File file, Class<V> type) {
         try {
             JsonReader reader = new JsonReader(new FileReader(file));
-            reader.setLenient(true);
+            reader.setStrictness(Strictness.LENIENT);
             return GSON.fromJson(reader, type);
         } catch (FileNotFoundException e) {
             throw new GsonException("gson lenient from error, file path: {}, type: {}", file.getPath(), type, e);
@@ -205,7 +276,7 @@ public class GsonUtil {
     public static <V> List<V> fromListLenient(File file, Class<V> type) {
         try {
             JsonReader reader = new JsonReader(new FileReader(file));
-            reader.setLenient(true);
+            reader.setStrictness(Strictness.LENIENT);
             TypeToken<List<V>> typeToken = (TypeToken<List<V>>)TypeToken.getParameterized(ArrayList.class, type);
             return GSON.fromJson(reader, typeToken.getType());
         } catch (FileNotFoundException e) {
@@ -221,7 +292,7 @@ public class GsonUtil {
             return null;
         }
         JsonReader reader = new JsonReader(new StringReader(json));
-        reader.setLenient(true);
+        reader.setStrictness(Strictness.LENIENT);
         return GSON.fromJson(reader, type);
     }
 
@@ -233,7 +304,7 @@ public class GsonUtil {
             return null;
         }
         JsonReader reader = new JsonReader(new StringReader(json));
-        reader.setLenient(true);
+        reader.setStrictness(Strictness.LENIENT);
         return GSON.fromJson(reader, type);
     }
 
@@ -245,7 +316,7 @@ public class GsonUtil {
             return null;
         }
         JsonReader reader = new JsonReader(new StringReader(json));
-        reader.setLenient(true);
+        reader.setStrictness(Strictness.LENIENT);
         return GSON.fromJson(reader, typeToken.getType());
     }
 
@@ -257,7 +328,7 @@ public class GsonUtil {
             return null;
         }
         JsonReader reader = new JsonReader(new StringReader(json));
-        reader.setLenient(true);
+        reader.setStrictness(Strictness.LENIENT);
         TypeToken<List<V>> typeToken = (TypeToken<List<V>>)TypeToken.getParameterized(ArrayList.class, type);
         return GSON.fromJson(reader, typeToken.getType());
     }

@@ -2,10 +2,12 @@ package com.dxy.library.json.fastjson;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
@@ -13,6 +15,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
 import com.alibaba.fastjson.parser.Feature;
 import com.alibaba.fastjson.serializer.SerializerFeature;
+import com.alibaba.fastjson.util.ParameterizedTypeImpl;
 
 import com.dxy.library.json.fastjson.exception.FastjsonException;
 import lombok.extern.slf4j.Slf4j;
@@ -75,17 +78,74 @@ public class FastjsonUtil {
     }
 
     /**
+     * JSON反序列化（Set）
+     */
+    public static <V> Set<V> fromSet(String json, Class<V> type) {
+        if (StringUtils.isEmpty(json)) {
+            return null;
+        }
+        return JSON.parseObject(json, new ParameterizedTypeImpl(new Type[] {type}, null, Set.class));
+    }
+
+    /**
      * JSON反序列化（List）
      */
     public static <V> List<V> fromList(String json, Class<V> type) {
+        if (StringUtils.isEmpty(json)) {
+            return null;
+        }
         return JSON.parseArray(json, type);
     }
 
     /**
      * JSON反序列化（Map）
      */
-    public static HashMap<String, Object> fromMap(String json) {
-        return JSON.parseObject(json, new TypeReference<HashMap<String, Object>>() {});
+    public static <K, V> Map<K, V> fromMap(String json, Class<K> keyType, Class<V> valueType) {
+        if (StringUtils.isEmpty(json)) {
+            return null;
+        }
+        return JSON.parseObject(json, new ParameterizedTypeImpl(new Type[] {keyType, valueType}, null, Map.class));
+    }
+
+    /**
+     * JSON反序列化（Map<K, List<V>>）
+     */
+    public static <K, V> Map<K, List<V>> fromListMap(String json, Class<K> keyType, Class<V> valueType) {
+        if (StringUtils.isEmpty(json)) {
+            return null;
+        }
+        ParameterizedTypeImpl valueParameterizedType = new ParameterizedTypeImpl(new Type[] {valueType}, null,
+            List.class);
+        return JSON.parseObject(json,
+            new ParameterizedTypeImpl(new Type[] {keyType, valueParameterizedType}, null, Map.class));
+    }
+
+    /**
+     * JSON反序列化（Map<K, Set<V>>）
+     */
+    public static <K, V> Map<K, Set<V>> fromSetMap(String json, Class<K> keyType, Class<V> valueType) {
+        if (StringUtils.isEmpty(json)) {
+            return null;
+        }
+
+        ParameterizedTypeImpl valueParameterizedType = new ParameterizedTypeImpl(new Type[] {valueType}, null,
+            Set.class);
+        return JSON.parseObject(json,
+            new ParameterizedTypeImpl(new Type[] {keyType, valueParameterizedType}, null, Map.class));
+    }
+
+    /**
+     * JSON反序列化（List<Map<K, V>>）
+     */
+    public static <K, V> List<Map<K, V>> fromMapList(String json, Class<K> keyType, Class<V> valueType) {
+        if (StringUtils.isEmpty(json)) {
+            return null;
+        }
+
+        ParameterizedTypeImpl valueParameterizedType = new ParameterizedTypeImpl(new Type[] {keyType, valueType}, null,
+            Map.class);
+        return JSON.parseObject(json,
+            new ParameterizedTypeImpl(new Type[] {valueParameterizedType}, null, List.class));
     }
 
     /**

@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.dxy.library.json.jackson.exception.JacksonException;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
@@ -48,7 +49,6 @@ import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
 import com.fasterxml.jackson.module.scala.DefaultScalaModule;
 import com.google.common.collect.Sets;
-import com.dxy.library.json.jackson.exception.JacksonException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -172,18 +172,6 @@ public class JacksonUtil {
     }
 
     /**
-     * JSON反序列化（List）
-     */
-    public static <V> List<V> fromList(URL url, Class<V> type) {
-        try {
-            CollectionType collectionType = mapper.getTypeFactory().constructCollectionType(ArrayList.class, type);
-            return mapper.readValue(url, collectionType);
-        } catch (IOException e) {
-            throw new JacksonException("jackson from error, url: {}, type: {}", url.getPath(), type, e);
-        }
-    }
-
-    /**
      * JSON反序列化
      */
     public static <V> V from(InputStream inputStream, Class<V> type) {
@@ -206,18 +194,6 @@ public class JacksonUtil {
     }
 
     /**
-     * JSON反序列化（List）
-     */
-    public static <V> List<V> fromList(InputStream inputStream, Class<V> type) {
-        try {
-            CollectionType collectionType = mapper.getTypeFactory().constructCollectionType(ArrayList.class, type);
-            return mapper.readValue(inputStream, collectionType);
-        } catch (IOException e) {
-            throw new JacksonException("jackson from error, type: {}", type, e);
-        }
-    }
-
-    /**
      * JSON反序列化
      */
     public static <V> V from(File file, Class<V> type) {
@@ -234,18 +210,6 @@ public class JacksonUtil {
     public static <V> V from(File file, TypeReference<V> type) {
         try {
             return mapper.readValue(file, type);
-        } catch (IOException e) {
-            throw new JacksonException("jackson from error, file path: {}, type: {}", file.getPath(), type, e);
-        }
-    }
-
-    /**
-     * JSON反序列化（List）
-     */
-    public static <V> List<V> fromList(File file, Class<V> type) {
-        try {
-            CollectionType collectionType = mapper.getTypeFactory().constructCollectionType(ArrayList.class, type);
-            return mapper.readValue(file, collectionType);
         } catch (IOException e) {
             throw new JacksonException("jackson from error, file path: {}, type: {}", file.getPath(), type, e);
         }
@@ -347,7 +311,7 @@ public class JacksonUtil {
     }
 
     /**
-     * JSON反序列化（List）
+     * JSON反序列化（Set）
      */
     public static <V> Set<V> fromSet(String json, Class<V> type) {
         if (StringUtils.isEmpty(json)) {
@@ -648,19 +612,19 @@ public class JacksonUtil {
 
     /**
      * 从json串中获取某个字段
-     *
      * @return byte[], 默认为 null
      */
-    public static byte[] getAsBytes(String json, String key) {
+    public static byte getAsByte(String json, String key) {
         if (StringUtils.isEmpty(json)) {
-            return null;
+            return 0;
         }
         try {
             JsonNode jsonNode = getAsJsonObject(json, key);
             if (null == jsonNode) {
-                return null;
+                return 0;
             }
-            return jsonNode.isBinary() ? jsonNode.binaryValue() : getAsString(jsonNode).getBytes();
+            return jsonNode.isInt() ? new Integer(jsonNode.intValue()).byteValue()
+                : Byte.parseByte(getAsString(jsonNode));
         } catch (Exception e) {
             throw new JacksonException("jackson get byte error, json: {}, key: {}", json, key, e);
         }
@@ -792,10 +756,8 @@ public class JacksonUtil {
     public static <V> String update(String json, String key, V value) {
         try {
             JsonNode node = mapper.readTree(json);
-            if (node instanceof ObjectNode) {
-                ((ObjectNode)node).remove(key);
-                add(node, key, value);
-            }
+            ((ObjectNode)node).remove(key);
+            add(node, key, value);
             return node.toString();
         } catch (IOException e) {
             throw new JacksonException("jackson update error, json: {}, key: {}, value: {}", json, key, value, e);
