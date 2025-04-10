@@ -38,38 +38,58 @@ Json工具类, 包含Gson、FastJson、Jackson三个库的工具类，其中Jack
 
 ## Gson使用示例：
 ```text
-     //JSON反序列化
-      Test test = GsonUtil.from(string, Test.class);
-      
-      //宽松JSON反序列化
-      Test test = GsonUtil.fromLenient(string, Test.class);
-      
-      //JSON序列化
-      String testStr = GsonUtil.to(test);
+    //JSON反序列化
+    Test test = GsonUtil.from(string, Test.class);
     
-      //JSON序列化为文件
-      GsonUtil.toFile(path, test);
-      
-      //JSON格式化
-      String testStr = GsonUtil.format(test);
+    Set<Integer> test = GsonUtil.fromSet(string, Integer.class);
     
-      //获取JSON中的单个字符串
-      String name = GsonUtil.getAsString(string,"name");
+    List<Test> test = GsonUtil.fromList(string, Test.class);
+    
+    Map<String, Integer> test = GsonUtil.fromMap(string, String.class, Integer.class);
+    
+    Map<String, List<Integer>> test = GsonUtil.fromMapList(string, String.class, Integer.class);
+    
+    List<Map<String, Integer>> test = GsonUtil.fromListMap(string, String.class, Integer.class);
+    
+    //宽松JSON反序列化
+    Test test = GsonUtil.fromLenient(string, Test.class);
+    
+    //JSON序列化
+    String testStr = GsonUtil.to(test);
+    
+    //JSON序列化为文件
+    GsonUtil.toFile(path, test);
+    
+    //JSON格式化
+    String testStr = GsonUtil.format(test);
+    
+    //获取JSON中的单个字符串
+    String name = GsonUtil.getAsString(string,"name");
 ```
 
 ## Fastjson使用示例：
 ```text
-     //JSON反序列化
-      Test test = FastjsonUtil.from(string, Test.class);
+    //JSON反序列化
+    Test test = FastjsonUtil.from(string, Test.class);
       
-      //JSON格式化
-      String testStr = FastjsonUtil.format(test);
+    Set<Integer> test = FastjsonUtil.fromSet(string, Integer.class);
     
-      //JSON序列化
-      String testStr = FastjsonUtil.to(test);
+    List<Test> test = FastjsonUtil.fromList(string, Test.class);
     
-      //获取JSON中的单个字符串
-      String name = FastjsonUtil.getAsString(string,"name");
+    Map<String, Integer> test = FastjsonUtil.fromMap(string, String.class, Integer.class);
+    
+    Map<String, List<Integer>> test = FastjsonUtil.fromMapList(string, String.class, Integer.class);
+    
+    List<Map<String, Integer>> test = FastjsonUtil.fromListMap(string, String.class, Integer.class);
+    
+    //JSON格式化
+    String testStr = FastjsonUtil.format(test);
+    
+    //JSON序列化
+    String testStr = FastjsonUtil.to(test);
+    
+    //获取JSON中的单个字符串
+    String name = FastjsonUtil.getAsString(string,"name");
 ```
 
 ## Jackson使用示例：
@@ -77,7 +97,17 @@ Json工具类, 包含Gson、FastJson、Jackson三个库的工具类，其中Jack
     
     //JSON反序列化
     Test test = JacksonUtil.from(string, Test.class);
+          
+    Set<Integer> test = JacksonUtil.fromSet(string, Integer.class);
     
+    List<Test> test = JacksonUtil.fromList(string, Test.class);
+    
+    Map<String, Integer> test = JacksonUtil.fromMap(string, String.class, Integer.class);
+    
+    Map<String, List<Integer>> test = JacksonUtil.fromMapList(string, String.class, Integer.class);
+    
+    List<Map<String, Integer>> test = JacksonUtil.fromListMap(string, String.class, Integer.class);
+
     //JSON格式化
     String testStr = JacksonUtil.format(test);
     
